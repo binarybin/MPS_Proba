@@ -5,6 +5,7 @@
 \usepackage[latin9]{inputenc}
 \usepackage{amstext}
 \usepackage{babel}
+\usepackage{courier}
 \begin{document}
 
 \title{Application of Matrix Product State on Probability Dynamics}
@@ -207,4 +208,23 @@ I don't think it's likely, anyway, we can increase the bound dimension
 and limit ourselves to small system size if we have to hand in something
 for the term project.\end{itemize}
 
+
+
+\section{Implementation}
+
+\subsection{MPS class}
+Parallel to the class \texttt{Exact}, we construct a class named \texttt{MPS} to store the MPS representation of the current state, to hold the MPO representation of the dynamic of the system and to comprise several functions which are necessary in updating the current state. The \texttt{MPS} class will include the following:
+
+\vspace{3mm}
+\noindent\textbf{Member data} We will have the current state in a variable named \texttt{MPState} which is a 3-d array storing $M^{\sigma_i}_{a_{i-1},a_i}$. The operator $O^{\sigma_i, \sigma'_i}_{n_{i-1}, n_i}$ will be stored in a variable named \texttt{MPO} which is a 4-d array. In addition, we will store the time of the system in the variable \texttt{T}.
+
+\vspace{3mm}
+\noindent\textbf{Constructor} The constructor will take a model of type \texttt{Model} and a initial state as argument and initilize the members \texttt{MPState}, \texttt{MPO} and \texttt{T}. Since we only focused on certain well-studied models and start the system from a given state, the form of \texttt{MPState} and \texttt{MPO} will be easy.
+
+\vspace{3mm}
+\noindent\textbf{Methods} As is shown in the flow chart, to update the state from time $t$ to $t+1$, one must first apply the MPO to the MPS and then do the compression. The reason why the compression step is necessary is that after applying MPO to MPS, the resulting MPS will have a greater degree of freedom. The compression step consists of projecting the resulting MPS (which is of higher dimension) back to the initial space (of a lower dimension). We shall write the routine \texttt{Step} responsible for applying MPO and updating the current state \texttt{MPState}. This routine will call \texttt{Compression} to make sure that the new state has the desired degree of freedom.
+
+Both \texttt{Step} and \texttt{Compression} will involve some basic operations of multiplication of arrays and summing over a certain number of indices (something like matrix multiplication). We shall implement these basic operations first, so \texttt{Step} and \texttt{Compression} can call these routines.
+
+Note that if we would like to calculate the expectation of a physical quatity, or the marginal probability of a physical states, we have to do the "overlapping" operation of two MPS. This again involves a number of basic operations defined in the class \texttt{MPS}. So the members in the class \texttt{Measurement} which handles the evaluation of expectations and probabilities, should be able to call the routines in the class \texttt{MPS}.
 \end{document}

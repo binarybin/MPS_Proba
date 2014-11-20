@@ -212,11 +212,12 @@ for the term project.\end{itemize}
 \section{Exact Solution}
 
 An exact solution may be obtained for the proposed system, as already pointed out. Because the dimension of state space grows exponentially, implementing such a solution becomes too computationally costly when dealing with a few dozen spins and/or chain sites. Nonetheless, an exact solution bounded by reasonably-sized state spaces will be needed to corroborate results obtained through the MPS algorithm.
-To generate an exact solution for reasonably-sized state-spaces, a class “Exact” will be implemented. The class will contain two functions.  A function “Interpreter” will read data contained in an instance of the class “Model”, including the length of the chain and local dimensions for each chain site. This data will be used to construct a transitional matrix, to be implemented as a sparse matrix, which will be used for simulating the current state of the system. The interpreter will then call on the “Step” function to solve for the state by stepping in discrete time.
+To generate an exact solution for reasonably-sized state-spaces, a class Exact will be implemented. The class will contain two functions.  A function Interpreter will read data contained in an instance of the class Model, including the length of the chain and local dimensions for each chain site. This data will be used to construct a transitional matrix, to be implemented as a sparse matrix, which will be used for simulating the current state of the system. The interpreter will then call on the Step function to solve for the state by stepping in discrete time.
 Additionally, a Monte Carlo simulation can be used to solve this problem. If time permits, a Monte Carlo simulation of the system will be implemented to serve as an addition comparator to the MPS algorithm.
 
 
 \section{Implementation}
+
 
 \subsection{MPS class}
 Parallel to the class \texttt{Exact}, we construct a class named \texttt{MPS} to store the MPS representation of the current state, to hold the MPO representation of the dynamic of the system and to comprise several functions which are necessary in updating the current state. The \texttt{MPS} class will include the following:

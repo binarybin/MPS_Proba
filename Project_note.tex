@@ -1,6 +1,7 @@
 %% LyX 2.1.1 created this file.  For more info, see http://www.lyx.org/.
 %% Do not edit unless you really know what you are doing.
 \documentclass[english]{article}
+\usepackage{graphicx}
 \usepackage[T1]{fontenc}
 \usepackage[latin9]{inputenc}
 \usepackage{amstext}
@@ -8,10 +9,10 @@
 \usepackage{courier}
 \begin{document}
 
-\title{Application of Matrix Product State on Probability Dynamics}
+\title{Design Document: \\Matrix Product State for Probability Dynamics}
 
 
-\author{Bin Xu}
+\author{Peter Gjeltema, Peiqi Wang, Jun Xiong, Bin Xu and  Liangsheng Zhang}
 
 \maketitle
 
@@ -217,6 +218,13 @@ Additionally, a Monte Carlo simulation can be used to solve this problem. If tim
 
 
 \section{Implementation}
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\textwidth]{flow_chart.PNG}
+\caption{The flow chart of our program.}
+\label{default}
+\end{center}
+\end{figure}
 
 
 \subsection{MPS class}

@@ -52,8 +52,6 @@ as
 \[
 |\psi\rangle=\sum_{\{\sigma_{i}\}}A_{\{\sigma_{i}\}}|\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}\rangle
 \]
-
-
 where $|\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}\rangle$
 is a product basis of the local Hilbert space on different sites.
 
@@ -63,15 +61,10 @@ the general form of $\hat{O}$ is
 \[
 \hat{O}=\sum_{\{\sigma\},\{\sigma'\}}|\sigma'_{1}\sigma'_{2}\sigma'_{3}\cdot\cdot\cdot\sigma'_{N}\rangle\langle\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}|O_{\{\sigma'\}\{\sigma\}}\rangle
 \]
- where $\langle\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}|$
-is a vector in the dual Hilbert space and $O_{\{\sigma'\}\{\sigma\}}$
-is a complex number that represents the amplitude of this map. The
-application of this operator on the state is naturally written as
+where $\langle\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}|$ is a vector in the dual Hilbert space and $O_{\{\sigma'\}\{\sigma\}}$ is a complex number that represents the amplitude of this map. The application of this operator on the state is naturally written as
 \[
 \hat{O}|\psi\rangle=\sum_{\{\sigma\},\{\sigma'\}}|\sigma'_{1}\sigma'_{2}\sigma'_{3}\cdot\cdot\cdot\sigma'_{N}\rangle\langle\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}|\ O_{\{\sigma'\}\{\sigma\}}\sum_{\{\sigma''_{i}\}}A_{\{\sigma_{''i}\}}|\sigma''_{1}\sigma''_{2}\sigma''_{3}\cdot\cdot\cdot\sigma''_{N}\rangle
 \]
-
-
 Using the orthonomal condition of basis, it can be simplified to
 
 \[
@@ -106,8 +99,6 @@ singular value decomposition (SVD) on this matrix gives
 \[
 A_{\sigma_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=U_{m_{1}}^{\sigma_{1}}S_{m_{1}m_{2}}V_{m_{2}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=U_{m_{1}}^{\sigma_{1}}\tilde{V}_{m_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}
 \]
-
-
 where $U$ is a $m\times m$ unitary matrix and $S$ is a $m\times m$
 diagonal matrix with non-negative diagonal elements arranged in decending
 order. We can apply a similar procedure on $\tilde{V}_{m_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
@@ -117,8 +108,6 @@ and applying a similar SVD:
 \[
 \tilde{V}_{(m_{1}\sigma_{2})(\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=U_{(m_{1}\sigma_{2})m_{2}}S_{m_{2}m_{2}'}V_{m_{2}'(\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=U_{m_{1}m_{2}}^{\sigma_{2}}\tilde{V}_{m_{2}(\sigma_{3}\cdot\cdot\cdot\sigma_{N})}
 \]
-
-
 where the second ``$=$'' reshapes the $U$ matrix and multiplied
 the $S$ and $V$ matrices. 
 
@@ -130,8 +119,6 @@ inductively and write the original coefficient tensor as
 \[
 A_{\{\sigma_{i}\}}=U_{m_{1}}^{\sigma_{1}}U_{m_{1}m_{2}}^{\sigma_{2}}U_{m_{2}m_{3}}^{\sigma_{3}}\cdot\cdot\cdot U_{m_{N-1}m_{N}}^{\sigma_{N}}
 \]
-
-
 This form is called the matrix product state, and $\sigma_{i}$'s
 are called ``physical indices'' while $m_{i}$'s are called ``auxiliary
 indices''. It worths noting that, in general, opeartors can also

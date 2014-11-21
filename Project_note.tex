@@ -209,7 +209,7 @@ In this project, we would like to extend the usage of MPS and MPO to problems co
 \subsection{Model}
 We will be considering a one dimensional problem with $n$ agents on a line at positions $i=1,2,\cdots,n$. Each agent has two states $(1,0)^T$ and $(0,1)^T$, so the state space is of dimension $2^n$, and the dynamics at each time step is determined by the following probability transition matrix:
 \begin{displaymath}
-H = \frac{1}{n}I + \sum_{i=1}^{n-1}\frac{1}{n}\sigma_i^x\otimes\sigma_{i+1}^x,
+H = pI + (1-p)\sum_{i=1}^{n-1}\frac{1}{n-1}\sigma_i^x\otimes\sigma_{i+1}^x,
 \end{displaymath}
 where $I$ is a $2^n\times2^n$ identity matrix and 
 \begin{displaymath}
@@ -219,7 +219,7 @@ where $I$ is a $2^n\times2^n$ identity matrix and
 1 & 0
 \end{pmatrix}
 \end{displaymath}
-operating on the 2-state space at position $i$. Intuitively, we can interpret the two states of each agent as "angry" $(1,0)^T$ and "calm" $(0,1)^T$, and the transition matrix describes the interactions among agents in terms of neighboring pairs. More specifically, each neighboring pair is equally likely to change their state or stay the same. We will start with the state where every agent is calm, and try to compute various joint probabilities at later times.
+operating on the 2-state space at position $i$. Intuitively, we can interpret the two states of each agent as "angry" $(1,0)^T$ and "calm" $(0,1)^T$, and the transition matrix describes the interactions among agents in terms of neighboring pairs. The chance such that the state remains untouched is $p$ and otherwise, with a same probability $(1-p)/(N-1)$, a pair will change its state.  We will start with the state where every agent is calm, and try to compute various joint probabilities at later times.
 
 \subsection{Implementation}
 
@@ -231,7 +231,7 @@ operating on the 2-state space at position $i$. Intuitively, we can interpret th
 \end{center}
 \end{figure}
 
-The implementation is summarized in Fig.~\ref{fig:flow_char}. The model will be implemented in two ways.
+The implementation is summarized in Fig.~\ref{fig:flow_chart}. The model will be implemented in two ways.
 
 \subsubsection{Exact Solution}
 
@@ -260,7 +260,7 @@ The \texttt{Measurement} class includes functions for calculating the expectatio
 \noindent\textbf{Alpha version} Release on 12/15/2014, written in Python. It will include the following work.
 \begin{itemize}
 \item  Model and Interface will include user specified information and determine the model used, number of steps, physical quantities to measure. Headed by Bin Xu.
-\item  The \texttt{MPS} class including the \texttt{Step} function will include the basic operations of MPS algoristhm. Headed by Peiqi Wang.
+\item  The \texttt{measurement} of interesting variables, such as the average values and various correlation functions is defined in the measurement class. Headed by Peiqi Wang.
 \item  The \texttt{Compression} function uses the building blocks in \texttt{MPS} to compress the new MPS matrices in the new step. Headed by Liangsheng Zhang and Jun Xiong.
 \item  The implementation of the \texttt{Measurement} will implement different functions to calculate physical properties . Headed by Liangsheng Zhang and Jun Xiong.
 \item  The \texttt{Exact} class calculates the exact time evolution of the initial state with a limited size. It may use the functions in \texttt{Measurement} to calculate physical properties . Headed by Peter Gjeltema.

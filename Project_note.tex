@@ -242,17 +242,29 @@ Additionally, a Monte Carlo simulation can be used to solve this problem. If tim
 
 \subsubsection{MPS class}
 Parallel to the class \texttt{Exact}, we construct a class named \texttt{MPS} to store the MPS representation of the current state, to hold the MPO representation of the dynamic of the system and to comprise several functions which are necessary in updating the current state. The \texttt{MPS} class will include the following:
-
-\vspace{3mm}
+\\[3mm]
 \noindent\textbf{Member data} We will have the current state in a variable named \texttt{MPState} which is a 3-d array storing $M^{\sigma_i}_{a_{i-1},a_i}$. The operator $O^{\sigma_i, \sigma'_i}_{n_{i-1}, n_i}$ will be stored in a variable named \texttt{MPO} which is a 4-d array. In addition, we will store the time of the system in the variable \texttt{T}.
-
-\vspace{3mm}
-\noindent\textbf{Constructor} The constructor will take a model of type \texttt{Model} and a initial state as argument and initilize the members \texttt{MPState}, \texttt{MPO} and \texttt{T}. Since we only focused on certain well-studied models and start the system from a given state, the form of \texttt{MPState} and \texttt{MPO} will be easy.
-
-\vspace{3mm}
+\\[3mm]
+\noindent\textbf{Constructor} The constructor will take a model of type \texttt{Model} and an initial state as argument and initilize the members \texttt{MPState}, \texttt{MPO} and \texttt{T}. Since we only focused on certain well-studied models and start the system from a given state, the form of \texttt{MPState} and \texttt{MPO} will be easy.
+\\[3mm]
 \noindent\textbf{Methods} As is shown in the flow chart, to update the state from time $t$ to $t+1$, one must first apply the MPO to the MPS and then do the compression. The reason why the compression step is necessary is that after applying MPO to MPS, the resulting MPS will have a greater degree of freedom. The compression step consists of projecting the resulting MPS (which is of higher dimension) back to the initial space (of a lower dimension). We shall write the routine \texttt{Step} responsible for applying MPO and updating the current state \texttt{MPState}. This routine will call \texttt{Compression} to make sure that the new state has the desired degree of freedom.
-
 Both \texttt{Step} and \texttt{Compression} will involve some basic operations of multiplication of arrays and summing over a certain number of indices (something like matrix multiplication). We shall implement these basic operations first, so \texttt{Step} and \texttt{Compression} can call these routines.
-
 Note that if we would like to calculate the expectation of a physical quatity, or the marginal probability of a physical states, we have to do the "overlapping" operation of two MPS. This again involves a number of basic operations defined in the class \texttt{MPS}. So the members in the class \texttt{Measurement} which handles the evaluation of expectations and probabilities, should be able to call the routines in the class \texttt{MPS}.
+\\[3mm]
+The \texttt{Compression} function of MPS will work iteratively. To initialize for the compression, we will apply SVD to the MPS representation of the states, and then truncate the decomposed matrices with D largest single value retained. The following steps of compression will minimize $||\psi^i-\psi^{i-1} ||^{2}$ iteratively, where $\psi^{i-1}$ is the state from the previous step while $\psi^i$ is the state obtained for the new $ith$ step. The extreme condition in minimizing $||\psi^i-\psi^{i-1} ||^{2}$ will require solving linear equations to get the new coefficients in the new matrices of the $ith$ step. After that the new state will also be normalized.
+\\[3mm]
+The \texttt{Measurement} class includes functions for calculating the expectation of a given operator, the conditional probability of certain states, and possibly the correlation functions of different time steps. Both the conditional probability and correlation function may require us to store the MPS at each step. By calling this storage, we don't need to rerun the MPS procedure to calculate new physical quantities. And this is one of the advantages of MPS over Monte Carlo method.
+\vspace{3mm}
+
+\section{Milestones}
+\noindent\textbf{Alpha version} Release on 12/15/2014, written in Python. It will include the following work.
+\begin{itemize}
+\item  Model and Interface will include user specified information and determine the model used, number of steps, physical quantities to measure. Headed by Bin Xu.
+\item  The \texttt{MPS} class including the \texttt{Step} function will include the basic operations of MPS algoristhm. Headed by Peiqi Wang.
+\item  The \texttt{Compression} function uses the building blocks in \texttt{MPS} to compress the new MPS matrices in the new step. Headed by Liangsheng Zhang and Jun Xiong.
+\item  The implementation of the \texttt{Measurement} will implement different functions to calculate physical properties . Headed by Liangsheng Zhang and Jun Xiong.
+\item  The \texttt{Exact} class calculates the exact time evolution of the initial state with a limited size. It may use the functions in \texttt{Measurement} to calculate physical properties . Headed by Peter Gjeltema.
+\end{itemize}
+\noindent\textbf{Beta version}  Given enough time, we will rewrite the above algorithms by C++ to speed up the computation. It will release on 01/15/2015.
 \end{document}
+

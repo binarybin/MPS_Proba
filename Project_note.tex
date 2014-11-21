@@ -5,6 +5,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[latin9]{inputenc}
 \usepackage{amstext}
+\usepackage{amsmath}
 \usepackage{babel}
 \usepackage{courier}
 \usepackage[margin=1in]{geometry}
@@ -40,9 +41,7 @@ the density matrix renormalization group blah blah blah, and then
 Schollwock (arXiv: 1008.3477, this one describes everything) and then
 Vidal and blah blah blah...
 
-
-\section{Matrix Product states (MPS)}
-
+\section{Background}
 
 \subsection{The difficult many body problem}
 
@@ -80,7 +79,7 @@ for $N=30$, taking more than $10$ seconds for one single contraction,
 which makes the problem intractable.
 
 
-\subsection{Matrix product representation of coefficients}
+\subsection{Matrix Product States (MPS)}
 
 To deal with the large number of terms in the contraction, we want
 to effectively split the space. Let's focus on the coefficient $A_{\{\sigma_{i}\}}=A_{\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}}$.
@@ -164,7 +163,7 @@ points, $\chi$ does not grow with system size (the length); in critial
 in 2D, $\chi\propto\exp W$ which is the exponential of short dimension.
 
 
-\section{Matrix Product Operators (MPO)}
+\subsection{Matrix Product Operators (MPO)}
 
 To be finished. I will give some constructions of nearest neighbour
 interactions, next nearest neighbour interactions and exponentially
@@ -172,57 +171,76 @@ decaying interactions. We will also need to describe the bound dimension
 of MPO that comes naturally by construction.
 
 
-\section{Shooting the moon}
+%\section{Shooting the moon}
 
-To be finished. I will describe the fancy applications of studying
-the probability distribution of several variables with somehow a ``1D''
-correlation. The distribution of a window of several dozens of sampling
-points (path probability distribution) can follow a stochastic differential/difference
-equation that can be treated much more efficiently with this algorithm.
---I may need to put this part at the end of our final report.
-
-
-\section{Get down to earth}
-
-For this course project, we can do a more preliminary level work.
-My crude plan is to:
-\begin{itemize}
-\item Make a model which may not be very realistic but is simple enough
-so that we can reduce it to a differential/difference equation that
-depends on multiple variables (degrees of freedom). We need to have
-more discussions on which model we want to write down. An optimization
-problem may be a nice choice.
-\item Perform imaginary time evolution on a random MPS and show that it
-converges to a optimized state.
-\item Use Monte Carlo to find the optimized state. This will validate our
-algorithm.
-\item It's likely that our algorithm is slower than Monte Carlo in optimization
-problems but let's not worry about this, we can claim that this method
-is promising because we can do real time evolution in the future.
-\item There is a small chance that our algorithm gives bad results... But
-I don't think it's likely, anyway, we can increase the bound dimension
-and limit ourselves to small system size if we have to hand in something
-for the term project.\end{itemize}
+%To be finished. I will describe the fancy applications of studying
+%the probability distribution of several variables with somehow a ``1D''
+%correlation. The distribution of a window of several dozens of sampling
+%points (path probability distribution) can follow a stochastic differential/difference
+%equation that can be treated much more efficiently with this algorithm.
+%--I may need to put this part at the end of our final report.
 
 
-\section{Exact Solution}
+%\section{Get down to earth}
 
-An exact solution may be obtained for the proposed system, as already pointed out. Because the dimension of state space grows exponentially, implementing such a solution becomes too computationally costly when dealing with a few dozen spins and/or chain sites. Nonetheless, an exact solution bounded by reasonably-sized state spaces will be needed to corroborate results obtained through the MPS algorithm.
-To generate an exact solution for reasonably-sized state-spaces, a class Exact will be implemented. The class will contain two functions.  A function Interpreter will read data contained in an instance of the class Model, including the length of the chain and local dimensions for each chain site. This data will be used to construct a transitional matrix, to be implemented as a sparse matrix, which will be used for simulating the current state of the system. The interpreter will then call on the Step function to solve for the state by stepping in discrete time.
-Additionally, a Monte Carlo simulation can be used to solve this problem. If time permits, a Monte Carlo simulation of the system will be implemented to serve as an addition comparator to the MPS algorithm.
+%For this course project, we can do a more preliminary level work.
+%My crude plan is to:
+%\begin{itemize}
+%\item Make a model which may not be very realistic but is simple enough
+%so that we can reduce it to a differential/difference equation that
+%depends on multiple variables (degrees of freedom). We need to have
+%more discussions on which model we want to write down. An optimization
+%problem may be a nice choice.
+%\item Perform imaginary time evolution on a random MPS and show that it
+%converges to a optimized state.
+%\item Use Monte Carlo to find the optimized state. This will validate our
+%algorithm.
+%\item It's likely that our algorithm is slower than Monte Carlo in optimization
+%problems but let's not worry about this, we can claim that this method
+%is promising because we can do real time evolution in the future.
+%\item There is a small chance that our algorithm gives bad results... But
+%I don't think it's likely, anyway, we can increase the bound dimension
+%and limit ourselves to small system size if we have to hand in something
+%for the term project.\end{itemize}
 
+\section{Project Overview}
+In this project, we would like to extend the usage of MPS and MPO to problems concerning stochastic processes. Particularly, we will consider the time evolution of a probability distribution expressed in a vector form, where the dynamics is specified by a probability transition matrix.
 
-\section{Implementation}
+\subsection{Model}
+We will be considering a one dimensional problem with $n$ agents on a line at positions $i=1,2,\cdots,n$. Each agent has two states $(1,0)^T$ and $(0,1)^T$, so the state space is of dimension $2^n$, and the dynamics at each time step is determined by the following probability transition matrix:
+\begin{displaymath}
+H = \frac{1}{n}I + \sum_{i=1}^{n-1}\frac{1}{n}\sigma_i^x\otimes\sigma_{i+1}^x,
+\end{displaymath}
+where $I$ is a $2^n\times2^n$ identity matrix and 
+\begin{displaymath}
+\sigma_i^x = 
+\begin{pmatrix}
+0 & 1 \\
+1 & 0
+\end{pmatrix}
+\end{displaymath}
+operating on the 2-state space at position $i$. Intuitively, we can interpret the two states of each agent as "angry" $(1,0)^T$ and "calm" $(0,1)^T$, and the transition matrix describes the interactions among agents in terms of neighboring pairs. More specifically, each neighboring pair is equally likely to change their state or stay the same. We will start with the state where every agent is calm, and try to compute various joint probabilities at later times.
+
+\subsection{Implementation}
+
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=\textwidth]{flow_chart.PNG}
 \caption{The flow chart of our program.}
-\label{default}
+\label{fig:flow_chart}
 \end{center}
 \end{figure}
 
+The implementation is summarized in Fig.~\ref{fig:flow_char}. The model will be implemented in two ways.
 
-\subsection{MPS class}
+\subsubsection{Exact Solution}
+
+An exact solution may be obtained for the proposed system. Because the dimension of state space grows exponentially, implementing such a solution becomes too computationally costly when dealing with a few dozen spins and/or chain sites. Nonetheless, an exact solution bounded by reasonably-sized state spaces will be needed to corroborate results obtained through the MPS algorithm.
+To generate an exact solution for reasonably-sized state-spaces, a class Exact will be implemented. The class will contain two functions.  A function Interpreter will read data contained in an instance of the class Model, including the length of the chain and local dimensions for each chain site. This data will be used to construct a transitional matrix, to be implemented as a sparse matrix, which will be used for simulating the current state of the system. The interpreter will then call on the Step function to solve for the state by stepping in discrete time.
+Additionally, a Monte Carlo simulation can be used to solve this problem. If time permits, a Monte Carlo simulation of the system will be implemented to serve as an addition comparator to the MPS algorithm.
+
+
+\subsubsection{MPS class}
 Parallel to the class \texttt{Exact}, we construct a class named \texttt{MPS} to store the MPS representation of the current state, to hold the MPO representation of the dynamic of the system and to comprise several functions which are necessary in updating the current state. The \texttt{MPS} class will include the following:
 
 \vspace{3mm}

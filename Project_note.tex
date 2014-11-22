@@ -222,13 +222,22 @@ operating on the 2-state space at position $i$. Intuitively, we can interpret th
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=\textwidth]{flow_chart.PNG}
+\includegraphics[width=0.7\textwidth]{flow_chart.PNG}
 \caption{The flow chart of our program.}
 \label{fig:flow_chart}
 \end{center}
 \end{figure}
 
-The implementation is summarized in Fig.~\ref{fig:flow_chart}. The model will be implemented in two ways.
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.4\textwidth]{class_diagram.png}
+\caption{A bird view of our classes.}
+\label{fig:class_diagram}
+\end{center}
+\end{figure}
+
+
+The implementation is summarized in Fig.~\ref{fig:flow_chart}. The model will be implemented in two ways. The classes used are described in Fig.~\ref{fig:class_diagram}.
 
 \subsubsection{Exact Solution}
 
@@ -250,7 +259,9 @@ Note that if we would like to calculate the expectation of a physical quatity, o
 \\[3mm]
 The \texttt{Compression} function of MPS will work iteratively. To initialize for the compression, we will apply SVD to the MPS representation of the states, and then truncate the decomposed matrices with $\chi$ largest single values retained. The following steps of compression will minimize $||\psi^i-\psi^{i-1} ||^{2}$ iteratively, where $\psi^{i-1}$ is the state from the previous step while $\psi^i$ is the state obtained for the new $ith$ step. The extrema condition in minimizing $||\psi^i-\psi^{i-1} ||^{2}$ will require solving linear equations to get the new coefficients in the new matrices of the $ith$ step. After that the new state will also be normalized.
 \\[3mm]
-The \texttt{Measurement} class includes functions for calculating the expectation of a given operator, the conditional probability of certain states, and possibly the correlation functions of different time steps. Both the conditional probability and correlation function may require us to store the MPS at each step. By calling this storage, we don't need to rerun the MPS procedure to calculate new physical quantities. And this is one of the advantages of MPS over Monte Carlo method. In the simplest form, the user can specify a set of states/operators through a defined structure, which are then overlapped with the final MPS to give (conditional) probabilities. If time permitted, we will try to extend the measurement to include time-dependent information.
+
+\subsubsection{Measurement Class}
+The \texttt{Measurement} class includes functions for calculating the expectation of a given operator, the conditional probability of certain states, and possibly the correlation functions of different time steps. Both the conditional probability and correlation function may require us to store the MPS at each step. By calling this storage, we don't need to rerun the MPS procedure to calculate new physical quantities. And this is one of the advantages of MPS over Monte Carlo method. In the simplest form, the user can specify a set of states/operators through a defined structure, which are then combined with final state of the system to give (conditional) probabilities. If time permitted, we will try to extend the measurement to include time-dependent information.
 \vspace{3mm}
 
 \subsection{Milestones}
@@ -260,7 +271,7 @@ The \texttt{Measurement} class includes functions for calculating the expectatio
 \item  The \texttt{measurement} of interesting variables, such as the average values and various correlation functions is defined in the measurement class. Headed by Peiqi Wang.
 \item  The \texttt{Compression} function uses the building blocks in \texttt{MPS} to compress the new MPS matrices in the new step. Headed by Liangsheng Zhang and Jun Xiong.
 \item  The implementation of the \texttt{Measurement} will implement different functions to calculate physical properties . Headed by Liangsheng Zhang and Jun Xiong.
-\item  The \texttt{Exact} class calculates the exact time evolution of the initial state for smaller sizes. It outputs results similar to those in \texttt{Measurement} in order for the comparison between two methods. Headed by Peter Gjeltema.
+\item  The \texttt{Exact} class calculates the exact time evolution of the initial state for smaller sizes. It may use the functions in \texttt{Measurement} to calculate physical properties. Headed by Peter Gjeltema.
 \end{itemize}
 \noindent\textbf{Beta version:} To be released on 01/15/2015. Several interesting work will include:
 \begin{itemize}

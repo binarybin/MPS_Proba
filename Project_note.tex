@@ -250,10 +250,10 @@ Note that if we would like to calculate the expectation of a physical quatity, o
 \\[3mm]
 The \texttt{Compression} function of MPS will work iteratively. To initialize for the compression, we will apply SVD to the MPS representation of the states, and then truncate the decomposed matrices with $\chi$ largest single values retained. The following steps of compression will minimize $||\psi^i-\psi^{i-1} ||^{2}$ iteratively, where $\psi^{i-1}$ is the state from the previous step while $\psi^i$ is the state obtained for the new $ith$ step. The extrema condition in minimizing $||\psi^i-\psi^{i-1} ||^{2}$ will require solving linear equations to get the new coefficients in the new matrices of the $ith$ step. After that the new state will also be normalized.
 \\[3mm]
-The \texttt{Measurement} class includes functions for calculating the expectation of a given operator, the conditional probability of certain states, and possibly the correlation functions of different time steps. Both the conditional probability and correlation function may require us to store the MPS at each step. By calling this storage, we don't need to rerun the MPS procedure to calculate new physical quantities. And this is one of the advantages of MPS over Monte Carlo method.
+The \texttt{Measurement} class includes functions for calculating the expectation of a given operator, the conditional probability of certain states, and possibly the correlation functions of different time steps. Both the conditional probability and correlation function may require us to store the MPS at each step. By calling this storage, we don't need to rerun the MPS procedure to calculate new physical quantities. And this is one of the advantages of MPS over Monte Carlo method. In the simplest form, the user can specify a set of states/operators through a defined structure, which are then overlapped with the final MPS to give (conditional) probabilities. If time permitted, we will try to extend the measurement to include time-dependent information.
 \vspace{3mm}
 
-\section{Milestones}
+\subsection{Milestones}
 \noindent\textbf{Alpha version:} To be released on 12/15/2014, written in Python. It will include the following work:
 \begin{itemize}
 \item  Model and Interface will include user specified information and determine the model used, number of steps, physical quantities to measure. Headed by Bin Xu.

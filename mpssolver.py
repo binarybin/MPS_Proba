@@ -3,6 +3,9 @@ Program name: MPS-Proba
 Program purpose: The Alpha version of the APC 524 project.
 File name: mpssolver.py
 File purpose: the solver class based on the matrix product states
+Responsible persons: 
+    Liangsheng Zhang and Jun Xiong for Contraction and Compression
+    Bin Xu for Interpreter
 """
 from solver import Solver
 

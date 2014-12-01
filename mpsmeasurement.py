@@ -3,6 +3,7 @@ Program name: MPS-Proba
 Program purpose: The Alpha version of the APC 524 project.
 File name: mpsmeasurement.py
 File purpose: the class for measuring several quantities using the exact solution
+Responsible person: Peiqi Wang
 """
 
 from measurement import Measurement

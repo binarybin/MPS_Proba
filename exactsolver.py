@@ -3,6 +3,7 @@ Program name: MPS-Proba
 Program purpose: The Alpha version of the APC 524 project.
 File name: exactsolver.py
 File purpose: the exact transition matrix solver class
+Responsible person: Peter Gjeltema
 """
 from solver import Solver
 

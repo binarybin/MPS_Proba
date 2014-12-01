@@ -3,6 +3,7 @@ Program name: MPS-Proba
 Program purpose: The Alpha version of the APC 524 project.
 File name: proba.py
 File purpose: the main routine
+Responsible person: Bin Xu
 Due date: 12/12/2014
 Author list:
     Bin Xu

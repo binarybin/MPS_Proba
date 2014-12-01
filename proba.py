@@ -33,7 +33,7 @@ from model import AngryBoys
 from exactsolver import ExactSolver
 from mpssolver import MpsSolver
 from exactmeasurement import ExactMeasurement
-
+from mpsmeasurement import MpsMeasurement
 
 if __name__=="main":
     """
@@ -52,3 +52,5 @@ if __name__=="main":
     exact_measurement = ExactMeasurement(exact_solver, main_output, aux_output)
     mps_measurement   = MpsMeasurement(mps_solver, main_output, aux_output)
     
+    exact_measurement.measure()
+    mps_measurement.measure()

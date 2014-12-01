@@ -13,7 +13,11 @@ class MpsSolver(Solver):
     """
     The exact solver base class, using transition matrix method
     """
-          
+    def __init__(self, model, bound_dimension, output1, output2):
+        self.model = model
+        self.output1 = output1
+        self.output2 = output2
+        self.bound_dimension = bound_dimension
     def Interpreter(self):
         raise NotImplementedError("please implement")
     def Step(self):

@@ -9,6 +9,7 @@ Responsible persons:
 """
 from solver import Solver
 from numpy import ndarray
+from model import AngryBoys
 
 class MpsSolver(Solver):
     """
@@ -18,8 +19,6 @@ class MpsSolver(Solver):
     mps_element = ndarray(shape = (2, 10, 10), dtype = float) # this is just an example of the mps, the order of indices: physical, left_aux, right_aux
     mpo_element = ndarray(shape = (2, 2, 4, 4), dtype = float) # this is just an example of the mpo, the order of indices: physical_in, physical_out, left_aux, right_aux
     
-    mps_chain = [] # list of mps
-    
     mps_result = [] # list of mps_chain, result history
     
     
@@ -28,8 +27,15 @@ class MpsSolver(Solver):
         self.output1 = output1
         self.output2 = output2
         self.bound_dimension = bound_dimension
+        
     def Interpreter(self):
-        raise NotImplementedError("please implement")
+        if type(self.model) == AngryBoys:
+            self.mpo = self.model.mpo
+            self.mps = self.model.mps
+        else:
+            raise Exception("The model is not supported!")
+        
+        
     def Step(self):
         raise NotImplementedError("please implement")
     def Evolve(self):

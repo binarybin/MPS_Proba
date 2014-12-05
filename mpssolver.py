@@ -10,10 +10,11 @@ Responsible persons:
 from solver import Solver
 from numpy import ndarray
 from model import AngryBoys
+import numpy as np
 
 class MpsSolver(Solver):
     """
-    The exact solver base class, using transition matrix method
+    The MPS solver base class
     """
     
     mps_element = ndarray(shape = (2, 10, 10), dtype = float) # this is just an example of the mps, the order of indices: physical, left_aux, right_aux
@@ -56,3 +57,30 @@ class MpsSolver(Solver):
     def Compression(self):
         self.CompressionSVD()
         self.CompressionVariational()
+    
+    #left-normalize the MPS from the left end to MPS[l]
+    def LeftNormalize(self,l):
+        for i in range(0,l-1):
+            A=np.reshape(self.mps[i],(self.mps[i].shape[0]*self.mps[i].shape[1],self.mps[i].shape[2]))
+            U, s, V=np.linalg.svd(A, full_matrices=False)
+            self.mps[i]=np.reshape(U,(self.mps[i].shape[0],self.mps[i].shape[1],U.shape[1]))
+            B=np.dot(np.diag(s),V)
+            self.mps[i+1]=np.tensordot(self.mps[i+1],B,axes=([1],[1]))
+            self.mps[i+1]=np.swapaxes(self.mps[i+1],1,2)
+
+    #right-normalize the MPS from the right end to MPS[l]
+    def RightNormalize(self,l):
+        L=len(self.mps)
+        for i in range(L-l-1):
+            A=np.swapaxes(self.mps[L-1-i],1,2)
+            A=np.reshape(A,(A.shape[0]*A.shape[1],A.shape[2]))
+            U, s, V=np.linalg.svd(A, full_matrices=False)
+            self.mps[L-1-i]=np.reshape(U,(self.mps[L-1-i].shape[0],self.mps[L-1-i].shape[2],U.shape[1]))
+            self.mps[L-1-i]=np.swapaxes(self.mps[L-1-i],1,2)
+            B=np.dot(np.diag(s),V)
+            self.mps[L-2-i]=np.tensordot(self.mps[L-2-i],B,axes=([2],[1]))
+
+    #obtain a mixed-canonical form centered on MPS[l]
+    def MixedCanonize(self,l):
+        self.LeftNormalize(l);
+        self.RightNormalize(l);

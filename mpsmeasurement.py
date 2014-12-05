@@ -8,6 +8,7 @@ Responsible person: Liangsheng Zhang
 
 from measurement import Measurement
 from exactsolver import ExactSolver
+from mpssolver import MpsSolver
 import numpy as np
 
 class MpsMeasurement(Measurement):
@@ -21,20 +22,22 @@ class MpsMeasurement(Measurement):
         # Assume for a mps, physical index 0 represents down and physical index 1 represents up
         # Assume solver.mps_result has elements time ordered and start from time 0
 
-        up = 1
-        down = 0
+        up = 1 # physical index for spin up
+        down = 0 # physical index for spin down
 
         # If time is not given in the task at the second position, then it is the last one
         if len(task) == 3:
             time = task[1]
+            task_pos = 2 # The positive in task where sites are given
 
             if time > len(self.solver.mps_result)-1 or -time > len(self.solver.mps_result):
                 raise Exception("Time for probability calculation too large.")
         else:
             time = -1
+            task_pos = 1
 
         # Sort the task in ascending order of positions
-        task_sort = sorted(task[1], key = lambda x:x[0])
+        task_sort = sorted(task[task_pos], key = lambda x:x[0])
 
         # Convert string to numbers
         for i in xrange(len(task_sort)):
@@ -89,17 +92,18 @@ class MpsMeasurement(Measurement):
         if down is None:
             down = -1
 
-        time = task[1]
-        sites = task[2]
-
         # If time is not given in the task at the second position, then it is the last one
         if len(task) == 3:
             time = task[1]
+            task_pos = 2 # The positive in task where sites are given
 
             if time > len(self.solver.mps_result)-1 or -time > len(self.solver.mps_result):
                 raise Exception("Time for correlation calculation too large.")
         else:
             time = -1
+            task_pos = 1
+
+        sites = task[task_pos].sort()
 
         # Assume every site has same physical dimension d, then all possible physical states can
         # be expressed as a number written in d basis
@@ -176,7 +180,7 @@ class MpsMeasurement(Measurement):
             time = task[1]
 
             if time > len(self.solver.mps_result)-1 or -time > len(self.solver.mps_result):
-                raise Exception("Time for mean calculation too large.")
+                raise Exception("Time for variance calculation too large.")
         else:
             time = -1
 

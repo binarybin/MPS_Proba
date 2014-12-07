@@ -41,6 +41,7 @@ class MpsSolver(Solver):
         self.output1 = output1
         self.output2 = output2
         self.bound_dimension = bound_dimension
+        self.t=0
         
     def Interpreter(self):
         if type(self.model) == AngryBoys:
@@ -56,13 +57,9 @@ class MpsSolver(Solver):
             raise Exception("The model is not supported!")
         
         
-    def Step(self):
-        raise NotImplementedError("please implement")
     def Evolve(self):
         raise NotImplementedError("please implement")
             
-    def Contraction(self):
-        raise NotImplementedError("please implement")
     def CompressionSVD(self):
         """
         The compression based on SVD, to be implemented by Jun Xiong
@@ -72,6 +69,23 @@ class MpsSolver(Solver):
     def Compression(self):
         self.CompressionSVD()
         self.CompressionVariational()
+    
+    
+    #Update the system state from t to t+1
+    def Step(self):
+        self.t=self.t+1
+        self.Contraction()
+        self.CompressionVariational()
+        
+        
+    #apply mpo on the current compressed mps (mpsc). store the result on variable mps
+    #convention for mpo: phys_in, phys_out, aux_l, aux_r
+    #convention for mps: phys, aux_l, aux_r
+    def Contraction(self):
+        for i in range(0,self.L-1):
+            A=np.tensordot(self.mpo[i],self.mpsc[i],axes=([0],[0]))
+            A=np.swapaxes(A,2,3)
+            self.mps[i]=np.reshape(A,(A.shape[0], A.shape[1]*A.shape[2], A.shape[3]*A.shape[4]))
     
     #overlap two mps, output <mps1,mps2>
     def Overlap(self,mps1,mps2):

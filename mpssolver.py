@@ -8,7 +8,6 @@ Responsible persons:
     Bin Xu for Interpreter
 """
 from solver import Solver
-from numpy import ndarray
 from model import AngryBoys
 import numpy as np
 
@@ -47,6 +46,8 @@ class MpsSolver(Solver):
         if type(self.model) == AngryBoys:
             self.mpo = self.model.mpo
             self.mps = self.model.mps
+            #when initializing, put mpsc the same as mps so we can apply mpo on it
+            self.mpsc = self.mmodel.mps
             self.L = self.model.L
             self.n = self.model.n
             self.partial_overlap_lr=[None]*self.L;
@@ -55,10 +56,6 @@ class MpsSolver(Solver):
             self.epsil=0.01
         else:
             raise Exception("The model is not supported!")
-        
-        
-    def Evolve(self):
-        raise NotImplementedError("please implement")
             
     def CompressionSVD(self):
         """

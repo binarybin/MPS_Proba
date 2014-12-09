@@ -25,58 +25,30 @@ class MpsMeasurement(Measurement):
         up = 1 # physical index for spin up
         down = 0 # physical index for spin down
 
-        # If time is not given in the task at the second position, then it is the last one
-        if len(task) == 3:
-            time = task[1]
-            task_pos = 2 # The positive in task where sites are given
-
-            if time > len(self.solver.mps_result)-1 or -time > len(self.solver.mps_result):
-                raise Exception("Time for probability calculation too large.")
-        else:
-            time = -1
-            task_pos = 1
+        # Get the time and true tasks
+        task_temp = []
+        time = self.getTimeTask(task, task_temp)
 
         # Sort the task in ascending order of positions
-        task_sort = sorted(task[task_pos], key = lambda x:x[0])
+        task_sort = sorted(task_temp, key = lambda x:x[0])
 
         # Convert string to numbers
         for i in xrange(len(task_sort)):
             task_sort[i][1] = eval(task_sort[i][1])
 
-        # Assume every site has same physical dimension d, then all possible physical states can
-        # be expressed as a number written in d basis
-        d = self.solver.mps_result[time][0].shape[0]
-        permu_max = d**(self.solver.model.size - len(task[1]))
+        # Use distributive law to compute probability
+        task_index = 0 # Position in task_sort          
+        prob = 1 # The probability that would be returned
 
-        # This number encodes all possible scenarios of physical indices
-        permu = 0
-
-        # The probability that would be returned
-        prob = 0
-
-        while permu < permu_max:
-            task_index = 0
-            prob_m = 1 # A temperory val storing the prob of a given configuration
-                       # indicated by permu
-
-            permu_temp = permu
-
-            for i in range(self.solver.model.size):
-                mps_temp = self.solver.mps_result[time][i]
-
-                # This is the site mentioned in the task
-                if task_index < len(task_sort) and i == task_sort[task_index]:
-                    spin = task_sort[task_index][1]
-                    prob_m = np.dot(prob_m, mps_temp[spin])
-                    task_index += 1
-
-                else:
-                    r = permu_temp % d # The physical index given by permu at this site
-                    permu_temp /= d
-                    prob_m = np.dot(prob_m, mps_temp[r])
-
-            permu += 1
-            prob += prob_m
+        for i in xrange(self.solver.L):
+            mps_temp = self.solver.mps_result[time][i]
+            if task_index < len(task_sort) and i == task_sort[task_index]:
+                spin = task_sort[task_index][1]
+                prob_mps = mps_temp[spin]
+                task_index += 1
+            else:
+                prob_mps = mps_temp[0] + mps_temp[1]
+            prob = np.dot(prob, prob_mps)
 
         return prob
 
@@ -92,58 +64,31 @@ class MpsMeasurement(Measurement):
         if down is None:
             down = -1
 
-        # If time is not given in the task at the second position, then it is the last one
-        if len(task) == 3:
-            time = task[1]
-            task_pos = 2 # The positive in task where sites are given
+        # Get the time and true tasks
+        task_temp = []
+        time = self.getTimeTask(task, task_temp)
 
-            if time > len(self.solver.mps_result)-1 or -time > len(self.solver.mps_result):
-                raise Exception("Time for correlation calculation too large.")
-        else:
-            time = -1
-            task_pos = 1
+        sites = task_temp.sort()
 
-        sites = task[task_pos].sort()
+        # Use distributive law to compute probability
+        task_index = 0 # Position in sites          
+        corr = 1 # The correlation that would be returned
 
-        # Assume every site has same physical dimension d, then all possible physical states can
-        # be expressed as a number written in d basis
-        d = self.solver.mps_result[time][0].shape[0]
-        permu_max = d**(self.solver.model.size)
-
-        # This number encodes all possible scenarios of physical indices
-        permu = 0
-
-        # The probability that would be returned
-        corr = 0
-
-        while permu < permu_max:
-            task_index = 0
-            prob_m = 1 # A temperory val storing the prob of a given configuration
-                       # indicated by permu
-
-            permu_temp = permu
-            val = 1
-
-            for i in range(self.solver.model.size):
-                mps_temp = self.solver.mps_result[time][i]
-
-                r = permu_temp % d # The physical index given by permu at this site
-                permu_temp /= d
-                prob_m = np.dot(prob_m, mps_temp[r])
-
-                # This is the site mentioned in the task
-                if task_index < len(sites) and i == sites[task_index]:
-                    val *= r*up + (1-r)*down
-                    task_index += 1
-
-            permu += 1
-            corr += prob_m * val
+        for i in xrange(self.solver.L):
+            mps_temp = self.solver.mps_result[time][i]
+            if task_index < len(sites) and i == sites[task_index]:
+                prob_mps = down * mps_temp[0] + up * mps_temp[1]
+                task_index += 1
+            else:
+                prob_mps = mps_temp[0] + mps_temp[1]
+            corr = np.dot(corr, prob_mps)
 
         return corr
 
     def measureMean(self, task, up=None, down=None):
         """
-        Mean is a special case of correlation, with only one variable. Just find the correct type and call measureCorrelation
+        Mean is a special case of correlation, with only one variable. Just find the correct type
+        and call measureCorrelation
         """
         # The value of up and down spins
         if up is None:
@@ -151,16 +96,11 @@ class MpsMeasurement(Measurement):
         if down is None:
             down = -1
 
-        # If time is not given in the task at the second position, then it is the last one
-        if len(task) == 3:
-            time = task[1]
+        # Get the time and true tasks
+        task_temp = []
+        time = self.getTimeTask(task, task_temp)
 
-            if time > len(self.solver.mps_result)-1 or -time > len(self.solver.mps_result):
-                raise Exception("Time for mean calculation too large.")
-        else:
-            time = -1
-
-        task_new = ("", time, range(self.solver.size))
+        task_new = ("", time, task_temp)
 
         return self.measureCorrelation(task_new, up, down)
 
@@ -175,16 +115,12 @@ class MpsMeasurement(Measurement):
         if down is None:
             down = -1
 
-        # If time is not given in the task at the second position, then it is the last one
-        if len(task) == 3:
-            time = task[1]
+        # Get the time and true tasks
+        task_temp = []
+        time = self.getTimeTask(task, task_temp)
 
-            if time > len(self.solver.mps_result)-1 or -time > len(self.solver.mps_result):
-                raise Exception("Time for variance calculation too large.")
-        else:
-            time = -1
+        task_new = ("", time, task_temp)
 
-        task_new = ("", time)
         ave = self.measureMean(task_new, up, down)
 
         up *= up
@@ -193,3 +129,32 @@ class MpsMeasurement(Measurement):
         square_ave = self.measureMean(task_new, up, down)
 
         return square_ave - ave*ave
+
+    def getTimeTask(self, task, task_temp):
+        """ 
+        For a given task, find the time for the computation and the true tasks.
+        If time is not given in the task at the second position, then it is the last one.
+        task_temp is the list that stores true tasks.
+        """
+
+        if len(task) == 3:
+            time = task[1]
+            task_pos = 2 # The positive in task where sites are given
+
+            if time > len(self.solver.mps_result)-1 or -time > len(self.solver.mps_result):
+                raise Exception("Time for calculation is too large.")
+        else:
+            time = -1
+            task_pos = 1
+
+        try:
+            len(task[task_pos][0])
+        except TypeError: # If the true task is not given as a list
+            task_temp = []
+            while task_pos < len(task):
+                task_temp.append(task[task_pos])
+                task_pos += 1
+        else:
+            task_temp = task[task_pos]
+
+        return time

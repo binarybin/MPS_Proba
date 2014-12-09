@@ -147,14 +147,11 @@ class MpsMeasurement(Measurement):
             time = -1
             task_pos = 1
 
-        try:
-            len(task[task_pos][0])
-        except TypeError: # If the true task is not given as a list
-            task_temp = []
+        if type(task[task_pos]) is list:
+            task_temp = task[task_pos]
+        else:
             while task_pos < len(task):
                 task_temp.append(task[task_pos])
                 task_pos += 1
-        else:
-            task_temp = task[task_pos]
 
         return time

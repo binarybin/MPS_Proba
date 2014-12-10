@@ -29,6 +29,8 @@ class MpsSolver(Solver):
     epsil: error threshold for CompressionVariational.
     cpr_err: error of the compression(L2 distance between compressed state and true state)
     """
+    """CompressionSVDSweepToRight and CompressionSVDSweepToLeft are the two methods for SVD compression implemented by Jun Xiong. The result is stored in self.mpsc.
+        """
     ##mps_element = ndarray(shape = (2, 10, 10), dtype = float) # this is just an example of the mps, the order of indices: physical, left_aux, right_aux
     ##mpo_element = ndarray(shape = (2, 2, 4, 4), dtype = float) # this is just an example of the mpo, the order of indices: physical_in, physical_out, left_aux, right_aux
     
@@ -57,11 +59,11 @@ class MpsSolver(Solver):
         else:
             raise Exception("The model is not supported!")
             
-    def CompressionSVD(self):
-        """
+    """def CompressionSVD(self):
+        
         The compression based on SVD, to be implemented by Jun Xiong
-        """
-        raise NotImplementedError("please implement")
+        
+        raise NotImplementedError("please implement")"""
         
     def Compression(self):
         self.CompressionSVD()
@@ -73,7 +75,62 @@ class MpsSolver(Solver):
         self.t=self.t+1
         self.Contraction()
         self.CompressionVariational()
-        
+    
+    def CompressionSVDSweepToRight(self):
+        # sweep from left to right and compress each matrix in mps
+        self.mpsc=[]
+        #mpsc records the result
+        self.mpsc.append(self.mps[0]) # mps[0] has dimension 1*x
+        mps_current=self.mps[1] #do svd and compression on site i
+        for i in range(1,self.L-1):
+            shape_left=mps_current.shape[1]
+            shape_right=mps_current.shape[2]
+            #these are the dimensions of the original matrix
+            s_dim=min(self.d, min(shape_left,shape_right))
+            #the dimension of the compressed s matrix
+            new_mpsc=np.random.rand(self.n, shape_left, s_dim)
+            mps_next=np.random.rand(self.n, s_dim, self.mps[i+1].shape[2])
+            #record the altered matrix of mps[i+1]
+            for j in range(0, mps_current.shape[0]):
+                U, s, V=np.linalg.svd(mps_current[j], full_matrices=False)
+                U=U[:, 0:s_dim]
+                s1=np.diag(s)[0:s_dim, 0:s_dim]
+                V=V[0:s_dim, :]
+                new_mpsc[j]=U
+                B=np.dot(s1,V)
+                C=np.dot(B,self.mps[i+1][j])
+                mps_next[j]=C
+            self.mpsc.append(new_mpsc)
+            mps_current=mps_next
+        self.mpsc.append(mps_current)
+    
+    def CompressionSVDSweepToLeft(self):
+        # sweep from Right to left and compress each matrix in mps
+        self.mpsc=[]
+        #mpsc records the result
+        self.mpsc.insert(0,self.mps[self.L-1]) # mps[0] has dimension 1*x
+        mps_current=self.mps[self.L-2] #do svd and compression on site i
+        for i in range(0,self.L-2):
+            shape_left=mps_current.shape[1]
+            shape_right=mps_current.shape[2]
+            #these are the dimensions of the original matrix
+            s_dim=min(self.d, min(shape_left,shape_right))
+            #the dimension of the compressed s matrix
+            new_mpsc=np.random.rand(self.n, s_dim, shape_right)
+            mps_next=np.random.rand(self.n, self.mps[self.L-3-i].shape[1], s_dim)
+            #record the altered matrix of mps[i+1]
+            for j in range(0, mps_current.shape[0]):
+                U, s, V=np.linalg.svd(mps_current[j], full_matrices=False)
+                U=U[:, 0:s_dim]
+                s1=np.diag(s)[0:s_dim, 0:s_dim]
+                V=V[0:s_dim, :]
+                new_mpsc[j]=V
+                B=np.dot(U, s1)
+                C=np.dot(self.mps[self.L-3-i][j], B)
+                mps_next[j]=C
+            self.mpsc.insert(0,new_mpsc)
+            mps_current=mps_next
+        self.mpsc.insert(0,mps_current)
         
     #apply mpo on the current compressed mps (mpsc). store the result on variable mps
     #convention for mpo: phys_in, phys_out, aux_l, aux_r

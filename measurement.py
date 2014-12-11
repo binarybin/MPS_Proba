@@ -12,18 +12,20 @@ class Measurement(object):
     """
     The abstract Measurement base class
     """
-    measurement_list = []
-    measure_result_list = []
+
     def __init__(self, solver, output1, output2):
         self.solver = solver
         self.output1 = output1
         self.output2 = output2
+        self.measurement_list = []
+        self.measure_result_list = []
+
     def addMeasureTask(self, task):
         self.measurement_list.append(task)
 
     def measure(self):
         for task in self.measurement_list:
-            self.measure_result_list.append(eval("measure"+task[0]+"(task)"))
+            self.measure_result_list.append(eval("self.measure"+task[0]+"(task)"))
 
 
     # All measure functions take the same input. They have different requested tasks and each measurement function should check the task properties. Raise an exception if

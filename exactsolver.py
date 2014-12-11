@@ -37,13 +37,13 @@ class ExactSolver(Solver):
     	for i in range(1,state_size):
 	    	for j in range(1,state_size):
 	    		if j != i and j != i+1:
-		    		matrix = (1-p)/(state_size-1)*np.kron(matrix, np.identity(2))
+		    		matrix = np.kron(matrix, np.identity(2))
 		    	else:
-			    	matrix = (1-p)/(state_size-1)*np.kron(matrix, sigmax)
+			    	matrix = np.kron(matrix, sigmax)
 			
 			part = np.add(part, matrix)
 			matrix = 1
-        H = np.add(H,part)
+        H = (1-p)/(state_size-1)*np.add(H,part)
 
     	#call step
     	Step(H)

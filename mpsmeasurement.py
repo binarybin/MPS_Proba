@@ -32,18 +32,14 @@ class MpsMeasurement(Measurement):
         # Sort the task in ascending order of positions
         task_sort = sorted(task_temp, key = lambda x:x[0])
 
-        # Convert string to numbers
-        for i in xrange(len(task_sort)):
-            task_sort[i][1] = eval(task_sort[i][1])
-
         # Use distributive law to compute probability
-        task_index = 0 # Position in task_sort          
+        task_index = 0 # Position in task_sort
         prob = 1 # The probability that would be returned
 
         for i in xrange(self.solver.L):
             mps_temp = self.solver.mps_result[time][i]
-            if task_index < len(task_sort) and i == task_sort[task_index]:
-                spin = task_sort[task_index][1]
+            if task_index < len(task_sort) and i == task_sort[task_index][0]:
+                spin = eval(task_sort[task_index][1])
                 prob_mps = mps_temp[spin]
                 task_index += 1
             else:
@@ -68,15 +64,15 @@ class MpsMeasurement(Measurement):
         task_temp = []
         time = self.getTimeTask(task, task_temp)
 
-        sites = task_temp.sort()
+        task_temp.sort()
 
         # Use distributive law to compute probability
-        task_index = 0 # Position in sites          
+        task_index = 0 # Position in sites
         corr = 1 # The correlation that would be returned
 
         for i in xrange(self.solver.L):
             mps_temp = self.solver.mps_result[time][i]
-            if task_index < len(sites) and i == sites[task_index]:
+            if task_index < len(task_temp) and i == task_temp[task_index]:
                 prob_mps = down * mps_temp[0] + up * mps_temp[1]
                 task_index += 1
             else:
@@ -131,7 +127,7 @@ class MpsMeasurement(Measurement):
         return square_ave - ave*ave
 
     def getTimeTask(self, task, task_temp):
-        """ 
+        """
         For a given task, find the time for the computation and the true tasks.
         If time is not given in the task at the second position, then it is the last one.
         task_temp is the list that stores true tasks.
@@ -148,7 +144,8 @@ class MpsMeasurement(Measurement):
             task_pos = 1
 
         if type(task[task_pos]) is list:
-            task_temp = task[task_pos]
+            for n in task[task_pos]:
+                task_temp.append(n)
         else:
             while task_pos < len(task):
                 task_temp.append(task[task_pos])

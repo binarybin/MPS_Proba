@@ -21,6 +21,7 @@ class MpsMeasurement(Measurement):
         """
         # Assume for a mps, physical index 0 represents down and physical index 1 represents up
         # Assume solver.mps_result has elements time ordered and start from time 0
+        # Assume the sites start from 0
 
         up = 1 # physical index for spin up
         down = 0 # physical index for spin down
@@ -129,11 +130,12 @@ class MpsMeasurement(Measurement):
     def getTimeTask(self, task, task_temp):
         """
         For a given task, find the time for the computation and the true tasks.
+        If the second element in the task is an integer, then it is taken as the time.
         If time is not given in the task at the second position, then it is the last one.
         task_temp is the list that stores true tasks.
         """
 
-        if len(task) == 3:
+        if isinstance(task[1], (int, long)):
             time = task[1]
             task_pos = 2 # The positive in task where sites are given
 

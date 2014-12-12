@@ -25,6 +25,7 @@ class AngryBoys(Model):
         self.init_state = init_state
         self.output1 = output1
         self.output2 = output2
+        self.model_type = "AngryBoys"
         self.hamiltonian = r"H = pI + (1-p)\sum_{i=1}^{n-1}\frac{1}{n-1}\sigma_i^x\otimes\sigma_{i+1}^x"
         self.prepareMpo()
         self.prepareMps()
@@ -72,7 +73,8 @@ class AngryBoys(Model):
         # store the list of mpo's
             
         self.mpo.append(mpo_left)
-        self.mpo.append(mpo_middle)
+        for i in range(self.size-2):
+            self.mpo.append(mpo_middle)
         self.mpo.append(mpo_right)
         
     def prepareMps(self):

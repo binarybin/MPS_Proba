@@ -255,7 +255,6 @@ class MpsSolver(Solver):
             self.partial_overlap_lr[i+1]=np.tensordot(self.partial_overlap_lr[i],A,axes=([0,1],[0,2]))
             B=np.tensordot(self.mpsc[i+1],self.mpsc[i+1],axes=([0],[0]))
             mpsc_module=np.tensordot(mpsc_module,B,axes=([0,1],[0,2]))
-            print "We are sweeping to right on site", i
         A=np.tensordot(self.partial_overlap_lr[self.L-2],self.mps[self.L-1],axes=([1],[1]))
         self.mpsc[self.L-1]=np.swapaxes(A,0,1)
         #no need to left-normalize the right-most MPS, we update partialoverlap list
@@ -296,7 +295,6 @@ class MpsSolver(Solver):
             self.partial_overlap_rl[self.L-i-2]=np.tensordot(self.partial_overlap_rl[self.L-i-1],A,axes=([0,1],[1,3]))
             B=np.tensordot(self.mpsc[self.L-i-2],self.mpsc[self.L-i-2],axes=([0],[0]))
             mpsc_module=np.tensordot(mpsc_module,B,axes=([0,1],[1,3]))
-            print "We are sweeping to left on site", i
         self.mpsc[0]=np.tensordot(self.mps[0],self.partial_overlap_rl[1],axes=([2],[1]))
         #no need to left-normalize the right-most MPS, we update partialoverlap list
         #this gives us <mpsc,mps> at the end of the iteration

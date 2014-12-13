@@ -13,11 +13,11 @@ class MpsMeasurementTest(unittest.TestCase):
         output1 = []
         output2 = []
 
-        w = np.ndarray(shape = (2, 1), dtype = float)
+        w = np.ndarray(shape = (2, 1, 1), dtype = float)
 
         for p in np.linspace(0,1,10):
-            w[0] = p
-            w[1] = 1-p
+            w[0] = [p]
+            w[1] = [1-p]
 
             solver.mps_result = [[]]
             solver.mps_result[0].append(w)
@@ -55,16 +55,16 @@ class MpsMeasurementTest(unittest.TestCase):
         output1 = []
         output2 = []
 
-        w1 = np.ndarray(shape = (2, 2), dtype = float)
-        w2 = np.ndarray(shape = (2, 2), dtype = float)
+        w1 = np.ndarray(shape = (2, 1, 2), dtype = float)
+        w2 = np.ndarray(shape = (2, 2, 1), dtype = float)
 
         for p1 in np.linspace(0,1,10):
-            w1[0] = [p1/2, p1]
-            w1[1] =  [(1-p1)/2, 1-p1]
+            w1[0] = [[p1/2, p1]]
+            w1[1] = [[(1-p1)/2, 1-p1]]
 
             for p2 in np.linspace(0,1,10):
-                w2[0] = [p2, p2/2]
-                w2[1] =  [1-p2, (1-p2)/2]
+                w2[0] = [[p2], [p2/2]]
+                w2[1] = [[1-p2], [(1-p2)/2]]
 
                 solver.mps_result = [[w1,w2]]
 
@@ -101,12 +101,12 @@ class MpsMeasurementTest(unittest.TestCase):
         output1 = []
         output2 = []
 
-        w1 = np.ndarray(shape = (2, 2), dtype = float)
+        w1 = np.ndarray(shape = (2, 1, 2), dtype = float)
         w2 = np.ndarray(shape = (2, 2, 4), dtype = float)
-        w3 = np.ndarray(shape = (2, 4), dtype = float)
+        w3 = np.ndarray(shape = (2, 4, 1), dtype = float)
 
-        w1[0] = [0,1]
-        w1[1] = [1,0]
+        w1[0] = [[0,1]]
+        w1[1] = [[1,0]]
 
         for p in np.linspace(0.1,0.5,10):
             for q in np.linspace(0.1,0.5,10):
@@ -116,8 +116,8 @@ class MpsMeasurementTest(unittest.TestCase):
                          [0, 1.0/sqrt(2), 1.0/sqrt(2), 0]])
                 w2[1] = ([[p/sqrt(p**2 + q**2), 0, 0, -p/sqrt(p**2+q**2)],
                          [0, 1.0/sqrt(2), -1.0/sqrt(2), 0]])
-                w3[0] = [0, sqrt(2)*r, 0, 0]
-                w3[1] = [sqrt(p**2 + q**2), 0, 0, 0]
+                w3[0] = [[0], [sqrt(2)*r], [0], [0]]
+                w3[1] = [[sqrt(p**2 + q**2)], [0], [0], [0]]
 
                 solver.mps_result = [[w1, w2, w3]]
 
@@ -155,7 +155,6 @@ class MpsMeasurementTest(unittest.TestCase):
 
                 for i in xrange(len(result)):
                     self.assertAlmostEqual(measure.measure_result_list[i], result[i])
-
 
 
 if __name__ == '__main__':

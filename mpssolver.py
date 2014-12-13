@@ -8,7 +8,8 @@ Responsible persons:
     Bin Xu for Interpreter
 """
 from solver import Solver
-from model import AngryBoys
+##from model import AngryBoys
+from copy import deepcopy
 import numpy as np
 
 class MpsSolver(Solver):
@@ -18,7 +19,7 @@ class MpsSolver(Solver):
     """
     Variables in the class
     L: length of the chain
-    d: dimension of the auxilary space for the compressed MPS
+    bound_dimension: dimension of the auxilary space for the compressed MPS
     n: dimension of the physical space
     mps: current state expressed in mps. It is the mps obtained after apply the mpo
     mpsc: current compressed mps. It is obtained by calling compression algorithm
@@ -34,24 +35,23 @@ class MpsSolver(Solver):
     ##mps_element = ndarray(shape = (2, 10, 10), dtype = float) # this is just an example of the mps, the order of indices: physical, left_aux, right_aux
     ##mpo_element = ndarray(shape = (2, 2, 4, 4), dtype = float) # this is just an example of the mpo, the order of indices: physical_in, physical_out, left_aux, right_aux
     
-    mps_result = [] # list of mps_chain, result history
-    
     
     def __init__(self, model, bound_dimension, output1, output2):
         self.model = model
         self.output1 = output1
         self.output2 = output2
-        self.bound_dimension = bound_dimension
+        self.bound_dimension = bound_dimension 
         self.t=0
+        self.mps_result = [] # list of mps_chain, result history
         
     def Interpreter(self):
-        if type(self.model) == AngryBoys:
+        if self.model.model_type == "AngryBoys":
             self.mpo = self.model.mpo
             self.mps = self.model.mps
             #when initializing, put mpsc the same as mps so we can apply mpo on it
-            self.mpsc = self.mmodel.mps
-            self.L = self.model.L
-            self.n = self.model.n
+            self.mpsc = deepcopy(self.model.mps)
+            self.L = len(self.model.mps)
+            self.n = np.shape(self.model.mps[0])[0]
             self.partial_overlap_lr=[None]*self.L;
             self.partial_overlap_rl=[None]*self.L;
             self.cpr_err=0
@@ -75,6 +75,7 @@ class MpsSolver(Solver):
         self.t=self.t+1
         self.Contraction()
         self.CompressionVariational()
+        self.mps_result.append(self.mpsc)
     
     def CompressionSVDSweepToRight(self):
         # sweep from left to right and compress each matrix in mps
@@ -86,7 +87,7 @@ class MpsSolver(Solver):
             shape_left=mps_current.shape[1]
             shape_right=mps_current.shape[2]
             #these are the dimensions of the original matrix
-            s_dim=min(self.d, min(shape_left,shape_right))
+            s_dim=min(self.bound_dimension, min(shape_left,shape_right))
             #the dimension of the compressed s matrix
             new_mpsc=np.random.rand(self.n, shape_left, s_dim)
             mps_next=np.random.rand(self.n, s_dim, self.mps[i+1].shape[2])
@@ -114,7 +115,7 @@ class MpsSolver(Solver):
             shape_left=mps_current.shape[1]
             shape_right=mps_current.shape[2]
             #these are the dimensions of the original matrix
-            s_dim=min(self.d, min(shape_left,shape_right))
+            s_dim=min(self.bound_dimension, min(shape_left,shape_right))
             #the dimension of the compressed s matrix
             new_mpsc=np.random.rand(self.n, s_dim, shape_right)
             mps_next=np.random.rand(self.n, self.mps[self.L-3-i].shape[1], s_dim)
@@ -136,7 +137,7 @@ class MpsSolver(Solver):
     #convention for mpo: phys_in, phys_out, aux_l, aux_r
     #convention for mps: phys, aux_l, aux_r
     def Contraction(self):
-        for i in range(0,self.L-1):
+        for i in range(0,self.L):
             A=np.tensordot(self.mpo[i],self.mpsc[i],axes=([0],[0]))
             A=np.swapaxes(A,2,3)
             self.mps[i]=np.reshape(A,(A.shape[0], A.shape[1]*A.shape[2], A.shape[3]*A.shape[4]))
@@ -187,14 +188,14 @@ class MpsSolver(Solver):
     def InitializeMpscVar(self):
         self.mpsc=[];
         #new_mps=np.zeros(shape=(n,1,d),dtype=float);
-        new_mps=np.random.rand(self.n,1,self.d);
+        new_mps=np.random.rand(self.n,1,self.bound_dimension);
         self.mpsc.append(new_mps)
         for i in range(2,self.L):
             #new_mps=np.zeros(shape=(n,d,d),dtype=float);
-            new_mps=np.random.rand(self.n,self.d,self.d);
+            new_mps=np.random.rand(self.n,self.bound_dimension,self.bound_dimension);
             self.mpsc.append(new_mps)       
         #new_mps=np.zeros(shape=(2,d,1),dtype=float)
-        new_mps=np.random.rand(self.m,self.d,1);
+        new_mps=np.random.rand(self.n,self.bound_dimension,1);
         self.mpsc.append(new_mps)
         #right-normalizae the states
         for i in range(self.L-1):

@@ -100,6 +100,6 @@ class AngryBoys(Model):
             raise Exception("Initial condition not supported!")
         
     def __repr__(self):
-        return ( "Hamiltonian: "+self.hamiltonian + "\nSystem length = "+str(self.size)+"\nt = "+str(self.remain_proba) +"\ninitial state: "+self.init_state)
+        return ( "Hamiltonian: "+self.hamiltonian + "\nSystem length = "+str(self.size)+"\nremain_proba = "+str(self.remain_proba) +"\ninitial state: "+self.init_state)
     
     

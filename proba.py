@@ -43,7 +43,7 @@ if __name__=="main":
     main_output = sys.stdout # the output channel for important results that will be shown in the final run
     aux_output = sys.stdout  # the output channel for auxiliary information that may be interesting for dubugging but not in the final run
     
-    angry_boys = AngryBoys(size = 10, change_rate = 0.1, init_state = "all down", output1 = main_output, output2 = aux_output)
+    angry_boys = AngryBoys(size = 10, remain_proba = 0.9, init_state = "all down", output1 = main_output, output2 = aux_output)
     exact_solver = ExactSolver(model = angry_boys, output1 = main_output, output2 = aux_output)
     mps_solver = MpsSolver(model = angry_boys, bound_dimension = 20, output1 = main_output, output2 = aux_output)
     exact_solver.evolve(step = 20)

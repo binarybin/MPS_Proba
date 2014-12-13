@@ -16,7 +16,7 @@ class ExactMeasurement(Measurement):
     """
     The Measurement class for exact solution
     """
-    def __init__(self)
+    def __init__(self):
         self.basis = itertools.product(*[(0, 1)] * self.solver.L)
 
     def measureProba(self, task):
@@ -31,18 +31,20 @@ class ExactMeasurement(Measurement):
         for item in task[1]:
             if item[1] == "up":
                 state = 1
-            else state = 0
+            else:
+                state = 0
             for combo in basis:
                 if combo(item(0)) != state:
                     break
                 elif counter == 0:
                     state_list.add[combo] = 0
-                else state_list[combo] += 1 
-            counter++
+                else:
+                    state_list[combo] += 1 
+            counter+=1
         tot_count=0
         for key in state_list:
             if state_list[key] == counter:
-                tot_count++
+                tot_count+=1
         return tot_count/self.solver.L
 
     def measureCorrelation(self, task):

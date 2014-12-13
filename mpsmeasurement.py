@@ -22,6 +22,8 @@ class MpsMeasurement(Measurement):
         # Assume for a mps, physical index 0 represents down and physical index 1 represents up
         # Assume solver.mps_result has elements time ordered and start from time 0
         # Assume the sites start from 0
+        # Assume the first mps is of shape (2,1,n)
+        # Assume the last mps if of shape (2,n,1)
 
         up = 1 # physical index for spin up
         down = 0 # physical index for spin down

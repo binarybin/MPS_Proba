@@ -62,3 +62,31 @@ class Measurement(object):
         Mean is a special case of correlation, with only one variable. Just find the correct type and call measureCorrelation
         """
         raise NotImplementedError("Unimplemented abstract method")
+
+    def getTimeTask(self, task, task_temp):
+        """
+        For a given task, find the time for the computation and the true tasks.
+        If the second element in the task is an integer, then it is taken as the time.
+        If time is not given in the task at the second position, then it is the last one.
+        task_temp is the list that stores true tasks.
+        """
+
+        if isinstance(task[1], (int, long)):
+            time = task[1]
+            task_pos = 2 # The positive in task where sites are given
+
+            if time > len(self.solver.mps_result)-1 or -time > len(self.solver.mps_result):
+                raise Exception("Time for calculation is too large.")
+        else:
+            time = -1
+            task_pos = 1
+
+        if type(task[task_pos]) is list:
+            for n in task[task_pos]:
+                task_temp.append(n)
+        else:
+            while task_pos < len(task):
+                task_temp.append(task[task_pos])
+                task_pos += 1
+
+        return time

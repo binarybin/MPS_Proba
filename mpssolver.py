@@ -43,9 +43,9 @@ class MpsSolver(Solver):
         self.bound_dimension = bound_dimension
         self.t=0
         self.results = [] # list of mps_chain, result history
-        self.Interpreter()
+        self.interpreter()
 
-    def Interpreter(self):
+    def interpreter(self):
         if self.model.model_type == "AngryBoys":
             self.mpo = self.model.mpo
             self.mps = self.model.mps
@@ -67,23 +67,23 @@ class MpsSolver(Solver):
 
         raise NotImplementedError("please implement")"""
 
-    def Compression(self):
-        self.CompressionSVD()
-        self.CompressionVariational()
+    def compression(self):
+        self.compressionSVD()
+        self.compressionVariational()
 
-    def Evolve(self,nstep):
+    def evolve(self,nstep):
         for i in range(nstep):
-            self.Step()
+            self.step()
 
     #Update the system state from t to t+1
-    def Step(self):
+    def step(self):
         self.t=self.t+1
-        self.Contraction()
-        self.CompressionVariational()
-        self.NormalizeProba()
+        self.contraction()
+        self.compressionVariational()
+        self.normalizeProba()
         self.results.append(self.mpsc)
 
-    def CompressionSVDSweepToRight(self):
+    def compressionSVDSweepToRight(self):
         # sweep from left to right and compress each matrix in mps
         self.mpsc=[]
         #mpsc records the result
@@ -111,7 +111,7 @@ class MpsSolver(Solver):
             mps_current=mps_next
         self.mpsc.append(mps_current)
 
-    def CompressionSVDSweepToRightTest(self):
+    def compressionSVDSweepToRightTest(self):
         self.mpsc[0] = self.mps[0]
         for i in range(0, self.L-1):
             A=np.reshape(self.mpsc[i],(self.mpsc[i].shape[0]*self.mpsc[i].shape[1],self.mpsc[i].shape[2]))
@@ -132,7 +132,7 @@ class MpsSolver(Solver):
             self.mpsc[i+1]=np.tensordot(self.mps[i+1],B,axes=([1],[1]))
             self.mpsc[i+1]=np.swapaxes(self.mpsc[i+1],1,2)
 
-    def CompressionSVDSweepToLeftTest(self):
+    def compressionSVDSweepToLeftTest(self):
         self.mpsc[self.L-1] = self.mps[self.L-1]
         for i in range(self.L-2, 0, -1):
             A=np.swapaxes(self.mpsc[i],1,2)
@@ -156,7 +156,7 @@ class MpsSolver(Solver):
 
 
 
-    def CompressionSVDSweepToLeft(self):
+    def compressionSVDSweepToLeft(self):
         # sweep from Right to left and compress each matrix in mps
         self.mpsc=[]
         #mpsc records the result
@@ -187,14 +187,14 @@ class MpsSolver(Solver):
     #apply mpo on the current compressed mps (mpsc). store the result on variable mps
     #convention for mpo: phys_in, phys_out, aux_l, aux_r
     #convention for mps: phys, aux_l, aux_r
-    def Contraction(self):
+    def contraction(self):
         for i in range(0,self.L):
             A=np.tensordot(self.mpo[i],self.mpsc[i],axes=([0],[0]))
             A=np.swapaxes(A,2,3)
             self.mps[i]=np.reshape(A,(A.shape[0], A.shape[1]*A.shape[2], A.shape[3]*A.shape[4]))
 
     #overlap two mps, output <mps1,mps2>
-    def Overlap(self,mps1,mps2):
+    def overlap(self,mps1,mps2):
         result=np.tensordot(mps1[0],mps2[0],axes=([0],[0]))
         result=result[0,:,0,:]
         #result=np.swapaxes(result,1,2)
@@ -208,7 +208,7 @@ class MpsSolver(Solver):
         return result
 
     #left-normalize the MPS from the left end to MPS[l]
-    def LeftNormalize(self,l):
+    def leftNormalize(self,l):
         for i in range(0,l-1):
             A=np.reshape(self.mps[i],(self.mps[i].shape[0]*self.mps[i].shape[1],self.mps[i].shape[2]))
             U, s, V=np.linalg.svd(A, full_matrices=False)
@@ -218,7 +218,7 @@ class MpsSolver(Solver):
             self.mps[i+1]=np.swapaxes(self.mps[i+1],1,2)
 
     #right-normalize the MPS from the right end to MPS[l]
-    def RightNormalize(self,l):
+    def rightNormalize(self,l):
         L=len(self.mps)
         for i in range(L-l-1):
             A=np.swapaxes(self.mps[L-1-i],1,2)
@@ -230,15 +230,15 @@ class MpsSolver(Solver):
             self.mps[L-2-i]=np.tensordot(self.mps[L-2-i],B,axes=([2],[1]))
 
     #obtain a mixed-canonical form centered on MPS[l]
-    def MixedCanonize(self,l):
-        self.LeftNormalize(l);
-        self.RightNormalize(l);
+    def mixedCanonize(self,l):
+        self.leftNormalize(l);
+        self.rightNormalize(l);
 
     '''
     The following code implements the Compression by variation.
     '''
     #Form a random guess for mpsc,and right normalized it. The result serves as the starting point for the iterations
-    def InitializeMpscVar(self):
+    def initializeMpscVar(self):
         self.mpsc=[];
         #new_mps=np.zeros(shape=(n,1,d),dtype=float);
         new_mps=np.random.rand(self.n,1,self.bound_dimension);
@@ -261,7 +261,7 @@ class MpsSolver(Solver):
             self.mpsc[self.L-2-i]=np.tensordot(self.mpsc[self.L-2-i],B,axes=([2],[1]))
 
     #Initialize the two lists of partial overlap
-    def InitializePartialOvl(self):
+    def initializePartialOvl(self):
         #self.partial_overlap_lr[0]=np.tensordot(self.mpsc[0],self.mps[0],axes=([0],[0]));
         #self.partial_overlap_lr[0]=self.partial_overlap_lr[0][0,:,0,:];
         self.partial_overlap_rl[self.L-1]=np.tensordot(self.mpsc[self.L-1],self.mps[self.L-1],axes=([0],[0]));
@@ -274,7 +274,7 @@ class MpsSolver(Solver):
             self.partial_overlap_rl[self.L-2-i]=np.tensordot(A,self.partial_overlap_rl[self.L-1-i],axes=([1,3],[0,1]))
 
     #Perform a single sweep from left to right
-    def CompressionSweepLeftRight(self):
+    def compressionSweepLeftRight(self):
         A=np.tensordot(self.mps[0],self.partial_overlap_rl[1],axes=([2],[1]))
         #perform left normalization
         A=np.reshape(A,(A.shape[0],A.shape[2]))
@@ -311,7 +311,7 @@ class MpsSolver(Solver):
         self.cpr_err=mpsc_module-2*self.partial_overlap_lr[self.L-1]
 
     #Perform a single sweep from right to left
-    def CompressionSweepRightLeft(self):
+    def compressionSweepRightLeft(self):
         A=np.tensordot(self.mps[self.L-1],self.partial_overlap_lr[self.L-2],axes=([1],[1]))
         #perform right normalization
         mA=A.shape[0]
@@ -350,36 +350,36 @@ class MpsSolver(Solver):
         self.cpr_err=mpsc_module-2*self.partial_overlap_rl[0]
 
     #wrap everything up
-    def CompressionVariational(self):
+    def compressionVariational(self):
         """
         The compression based on the variational principle, to be implemented by Peiqi Wang
         """
         ##form a initial guess
-        self.InitializeMpscVar()
+        self.initializeMpscVar()
         ##Initialize Partial Overlap lists
-        self.InitializePartialOvl()
+        self.initializePartialOvl()
         ##Calculate the L2 norm of the MPS to be compressed
-        mps_norm=self.Overlap(self.mps,self.mps)
+        mps_norm=self.overlap(self.mps,self.mps)
         error=10000
         ##Direction of previous sweep. 0 means left to right and 1 means right to left
         last_direction=1
         while (error>self.epsil):
             if (last_direction==1):
                 last_cpr_err=self.cpr_err
-                self.CompressionSweepLeftRight()
+                self.compressionSweepLeftRight()
                 self.cpr_err=self.cpr_err+mps_norm
                 #print(self.cpr_err)
                 self.output2.write('L2 distance = '+str(self.cpr_err)+'\n')
                 error=abs(last_cpr_err-self.cpr_err)
             elif (last_direction==0):
                 last_cpr_err=self.cpr_err
-                self.CompressionSweepRightLeft()
+                self.compressionSweepRightLeft()
                 self.cpr_err=self.cpr_err+mps_norm
                 #print(self.cpr_err)
                 self.output2.write('L2 distance = '+str(self.cpr_err)+'\n')
                 error=abs(last_cpr_err-self.cpr_err)
 
-    def NormalizeProba(self):
+    def normalizeProba(self):
         result=np.sum(self.mpsc[0],axis=0)
         for i in range(self.L-1):
             A=np.sum(self.mpsc[i+1],axis=0)

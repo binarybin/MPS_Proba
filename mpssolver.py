@@ -43,6 +43,7 @@ class MpsSolver(Solver):
         self.bound_dimension = bound_dimension 
         self.t=0
         self.mps_result = [] # list of mps_chain, result history
+        self.Interpreter()
         
     def Interpreter(self):
         if self.model.model_type == "AngryBoys":
@@ -50,6 +51,7 @@ class MpsSolver(Solver):
             self.mps = self.model.mps
             #when initializing, put mpsc the same as mps so we can apply mpo on it
             self.mpsc = deepcopy(self.model.mps)
+            self.mps_result.append(self.mpsc)
             self.L = len(self.model.mps)
             self.n = np.shape(self.model.mps[0])[0]
             self.partial_overlap_lr=[None]*self.L;
@@ -68,8 +70,11 @@ class MpsSolver(Solver):
     def Compression(self):
         self.CompressionSVD()
         self.CompressionVariational()
-    
-    
+
+    def Evolve(self,nstep):
+        for i in range(nstep):
+            self.step()
+          
     #Update the system state from t to t+1
     def Step(self):
         self.t=self.t+1

@@ -18,6 +18,12 @@ class ExactSolver(Solver):
     	self.model = model      
     	self.output1 = output1
     	self.output2 = output2
+        self.H = 0
+        self.t = 0
+        self.results = []
+        self.results.append(self.model.init_state)
+        self.check_norm = []
+
 
     def Interpreter(self):
     	if type(self.model) != AngryBoys:
@@ -31,7 +37,7 @@ class ExactSolver(Solver):
     	sigmax = np.matrix('0 1; 1 0')
 
     	#create hamiltonian
-    	H = p*np.identity(math.pow(2,state_size))
+    	self.H = p*np.identity(math.pow(2,state_size))
     	matrix = 1
     	part = np.zeros((math.pow(2,state_size),math.pow(2,state_size)))
     	for i in range(1,state_size):
@@ -43,22 +49,15 @@ class ExactSolver(Solver):
 			
 			part = np.add(part, matrix)
 			matrix = 1
-        H = (1-p)/(state_size-1)*np.add(H,part)
+        self.H = (1-p)/(state_size-1)*np.add(H,part)
 
-    	#call step
-    	Step(H)
+    def Step(self):
+        self.t += 1
+    	return self.H.dot(self.results[-1])
 
-    def Step(self,H):
-    	#take step
-    	new_state = H.dot(self.model.init_state) 
-
-    	#call evolve
-    	Evolve(new_state)
-
-    def Evolve(self, new_state):
+    def Evolve(self, nstep):
     	#add state to list
-    	self.output1.append(new_state)
-
-    	#aux data with state (sum to 1)
-    	check_norm = new_state.sum(axis=0)
-    	self.output2.append(check_norm)
+        for i in range(num_steps):
+            new_state = self.Step()
+            self.results.append(new_state)
+            self.check_norm.append(new_state.sum(axis=0))

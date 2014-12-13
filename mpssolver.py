@@ -323,13 +323,15 @@ class MpsSolver(Solver):
                 last_cpr_err=self.cpr_err
                 self.CompressionSweepLeftRight()
                 self.cpr_err=self.cpr_err+mps_norm
-                print(self.cpr_err)
+                #print(self.cpr_err)
+                self.output2.write('L2 distance = '+str(self.cpr_err)+'\n')
                 error=abs(last_cpr_err-self.cpr_err)
             elif (last_direction==0):
                 last_cpr_err=self.cpr_err
                 self.CompressionSweepRightLeft()
                 self.cpr_err=self.cpr_err+mps_norm
-                print(self.cpr_err)
+                #print(self.cpr_err)
+                self.output2.write('L2 distance = '+str(self.cpr_err)+'\n')
                 error=abs(last_cpr_err-self.cpr_err)
                 
     def NormalizeProba(self):

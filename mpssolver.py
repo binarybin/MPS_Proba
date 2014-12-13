@@ -80,6 +80,7 @@ class MpsSolver(Solver):
         self.t=self.t+1
         self.Contraction()
         self.CompressionVariational()
+        self.NormalizeProba()
         self.mps_result.append(self.mpsc)
     
     def CompressionSVDSweepToRight(self):
@@ -151,12 +152,14 @@ class MpsSolver(Solver):
     def Overlap(self,mps1,mps2):
         result=np.tensordot(mps1[0],mps2[0],axes=([0],[0]))
         result=result[0,:,0,:]
+        #result=np.swapaxes(result,1,2)
         L=len(mps1)
         if len(mps2)!=L:
             raise Exception("Cannot overlap two mps with different lengths")
         for i in range(L-1):
             B=np.tensordot(mps1[i+1],mps2[i+1],axes=([0],[0]))
             result=np.tensordot(result,B,axes=([0,1],[0,2]))
+            #result=np.tensordot(result,B,axes=([2,3],[0,2]))
         return result
     
     #left-normalize the MPS from the left end to MPS[l]
@@ -214,13 +217,13 @@ class MpsSolver(Solver):
 
     #Initialize the two lists of partial overlap
     def InitializePartialOvl(self):
-        self.partial_overlap_lr[0]=np.tensordot(self.mpsc[0],self.mps[0],axes=([0],[0]));
-        self.partial_overlap_lr[0]=self.partial_overlap_lr[0][0,:,0,:];
+        #self.partial_overlap_lr[0]=np.tensordot(self.mpsc[0],self.mps[0],axes=([0],[0]));
+        #self.partial_overlap_lr[0]=self.partial_overlap_lr[0][0,:,0,:];
         self.partial_overlap_rl[self.L-1]=np.tensordot(self.mpsc[self.L-1],self.mps[self.L-1],axes=([0],[0]));
         self.partial_overlap_rl[self.L-1]=self.partial_overlap_rl[self.L-1][:,0,:,0];
-        for i in range(self.L-1):
-            A=np.tensordot(self.mpsc[i+1],self.mps[i+1],axes=([0],[0]))
-            self.partial_overlap_lr[i+1]=np.tensordot(self.partial_overlap_lr[i],A,axes=([0,1],[0,2]))
+        #for i in range(self.L-1):
+            #A=np.tensordot(self.mpsc[i+1],self.mps[i+1],axes=([0],[0]))
+            #self.partial_overlap_lr[i+1]=np.tensordot(self.partial_overlap_lr[i],A,axes=([0,1],[0,2]))
         for i in range(self.L-1):
             A=np.tensordot(self.mpsc[self.L-2-i],self.mps[self.L-2-i],axes=([0],[0]))
             self.partial_overlap_rl[self.L-2-i]=np.tensordot(A,self.partial_overlap_rl[self.L-1-i],axes=([1,3],[0,1]))
@@ -328,3 +331,11 @@ class MpsSolver(Solver):
                 self.cpr_err=self.cpr_err+mps_norm
                 print(self.cpr_err)
                 error=abs(last_cpr_err-self.cpr_err)
+                
+    def NormalizeProba(self):
+        result=np.sum(self.mpsc[0],axis=0)
+        for i in range(self.L-1):
+            A=np.sum(self.mpsc[i+1],axis=0)
+            result=np.dot(result,A)
+        result=float(result)**(1.0/self.L)
+        self.mpsc=[(self.mpsc[n])/result for n in range(self.L)]

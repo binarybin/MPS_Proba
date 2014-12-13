@@ -75,7 +75,7 @@ class Measurement(object):
             time = task[1]
             task_pos = 2 # The positive in task where sites are given
 
-            if time > len(self.solver.mps_result)-1 or -time > len(self.solver.mps_result):
+            if time > len(self.solver.results)-1 or -time > len(self.solver.results):
                 raise Exception("Time for calculation is too large.")
         else:
             time = -1

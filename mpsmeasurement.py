@@ -49,7 +49,7 @@ class MpsMeasurement(Measurement):
                 prob_mps = mps_temp[0] + mps_temp[1]
             prob = np.dot(prob, prob_mps)
 
-        return prob
+        return float(prob)
 
     def measureCorrelation(self, task, up=None, down=None):
         """
@@ -82,7 +82,7 @@ class MpsMeasurement(Measurement):
                 prob_mps = mps_temp[0] + mps_temp[1]
             corr = np.dot(corr, prob_mps)
 
-        return corr
+        return float(corr)
 
     def measureMean(self, task, up=None, down=None):
         """

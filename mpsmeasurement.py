@@ -20,7 +20,7 @@ class MpsMeasurement(Measurement):
         This implements the measurement of the probability (possibly joint probability) for an event or several events to be realized
         """
         # Assume for a mps, physical index 0 represents down and physical index 1 represents up
-        # Assume solver.mps_result has elements time ordered and start from time 0
+        # Assume solver.results has elements time ordered and start from time 0
         # Assume the sites start from 0
         # Assume the first mps is of shape (2,1,n)
         # Assume the last mps if of shape (2,n,1)
@@ -40,7 +40,7 @@ class MpsMeasurement(Measurement):
         prob = 1 # The probability that would be returned
 
         for i in xrange(self.solver.L):
-            mps_temp = self.solver.mps_result[time][i]
+            mps_temp = self.solver.results[time][i]
             if task_index < len(task_sort) and i == task_sort[task_index][0]:
                 spin = eval(task_sort[task_index][1])
                 prob_mps = mps_temp[spin]
@@ -74,7 +74,7 @@ class MpsMeasurement(Measurement):
         corr = 1 # The correlation that would be returned
 
         for i in xrange(self.solver.L):
-            mps_temp = self.solver.mps_result[time][i]
+            mps_temp = self.solver.results[time][i]
             if task_index < len(task_temp) and i == task_temp[task_index]:
                 prob_mps = down * mps_temp[0] + up * mps_temp[1]
                 task_index += 1

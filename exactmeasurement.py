@@ -45,7 +45,7 @@ class ExactMeasurement(Measurement):
         for i in range(len(self.basis)):
             match = True
             for j in range(len(temptask)):
-                if self.basis[i][temptask[j][0]-1] != self.convert(temptask[j][1]):
+                if self.basis[i][temptask[j][0]] != self.convert(temptask[j][1]):
                     match = False
             if match:
                 proba += self.solver.results[time][i]

@@ -126,13 +126,13 @@ class MpsMeasurementTest(unittest.TestCase):
                 task_up = ("Proba", (0, "up"))
                 prob_up = p + q
 
-                task_r_up_down = ("Proba", (1, "up"), (2, "down"))
+                task_r_up_down = ("Proba", (1, "up"), (-1, "down"))
                 prob_r_up_down = r
 
                 task_corr1 = ("Correlation",[0, 2])
                 corr1 = 1
 
-                task_corr2 = ("Correlation", [1,2])
+                task_corr2 = ("Correlation", [1,-1])
                 corr2 = p - q
 
                 task_mean1 = ("Mean", [1])
@@ -141,7 +141,7 @@ class MpsMeasurementTest(unittest.TestCase):
                 task_mean2 = ("Mean", [0])
                 mean2 = p + q - 2 * r
 
-                task_var = ("Variance", [2])
+                task_var = ("Variance", [-1])
                 var = 1 - (p+q-2*r)**2
 
                 task = ([task_up, task_r_up_down, task_corr1, task_corr2, task_mean1,

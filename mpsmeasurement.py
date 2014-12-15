@@ -7,8 +7,6 @@ Responsible person: Liangsheng Zhang
 """
 
 from measurement import Measurement
-from exactsolver import ExactSolver
-from mpssolver import MpsSolver
 import numpy as np
 
 class MpsMeasurement(Measurement):
@@ -25,12 +23,21 @@ class MpsMeasurement(Measurement):
         # Assume the first mps is of shape (2,1,n)
         # Assume the last mps if of shape (2,n,1)
 
+        if task[0] != "Proba":
+            raise Exception("Proba function is called incorrectly in MPS measurement")
+
         up = 1 # physical index for spin up
         down = 0 # physical index for spin down
 
         # Get the time and true tasks
         task_temp = []
         time = self.getTimeTask(task, task_temp)
+
+        # Allow negative site number following python convention
+        for index in range(len(task_temp)):
+            if task_temp[index][0] < 0:
+                task_temp[index] = (self.solver.L + task_temp[index][0], task_temp[index][1])
+
 
         # Sort the task in ascending order of positions
         task_sort = sorted(task_temp, key = lambda x:x[0])
@@ -57,6 +64,10 @@ class MpsMeasurement(Measurement):
         the values corresponding to up and down spins. If they are not given, then by default
         up is 1 and down is -1
         """
+
+        if task[0] != "Correlation":
+            raise Exception("Correlation function is called incorrectly in MPS measurement")
+
         # The value of up and down spins
         if up is None:
             up = 1
@@ -66,6 +77,10 @@ class MpsMeasurement(Measurement):
         # Get the time and true tasks
         task_temp = []
         time = self.getTimeTask(task, task_temp)
+
+        for index in range(len(task_temp)):
+            if task_temp[index]<0:
+                task_temp[index] = self.solver.L + task_temp[index]
 
         task_temp.sort()
 
@@ -89,6 +104,10 @@ class MpsMeasurement(Measurement):
         Mean is a special case of correlation, with only one variable. Just find the correct type
         and call measureCorrelation
         """
+
+        if task[0] != "Mean":
+            raise Exception("Mean function is called incorrectly in MPS measurement")
+
         # The value of up and down spins
         if up is None:
             up = 1
@@ -99,7 +118,7 @@ class MpsMeasurement(Measurement):
         task_temp = []
         time = self.getTimeTask(task, task_temp)
 
-        task_new = ("", time, task_temp)
+        task_new = ("Correlation", time, task_temp)
 
         return self.measureCorrelation(task_new, up, down)
 
@@ -108,6 +127,9 @@ class MpsMeasurement(Measurement):
         measureMean is used when evaluating variance.
         """
 
+        if task[0] != "Variance":
+            raise Exception("Variance function is called incorrectly in MPS measurement")
+
         # The value of up and down spins
         if up is None:
             up = 1
@@ -118,7 +140,7 @@ class MpsMeasurement(Measurement):
         task_temp = []
         time = self.getTimeTask(task, task_temp)
 
-        task_new = ("", time, task_temp)
+        task_new = ("Mean", time, task_temp)
 
         ave = self.measureMean(task_new, up, down)
 

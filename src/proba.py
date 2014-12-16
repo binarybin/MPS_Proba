@@ -46,7 +46,7 @@ if __name__=="__main__":
     
     angry_boys = AngryBoys(size = 10, remain_proba = 0.2, init_state = "all down", output1 = main_output, output2 = aux_output)
     exact_solver = ExactSolver(model = angry_boys, output1 = main_output, output2 = aux_output)
-    mps_solver = MpsSolver(model = angry_boys, bound_dimension = 5, output1 = main_output, output2 = aux_output)
+    mps_solver = MpsSolver(model = angry_boys, bound_dimension = 10, output1 = main_output, output2 = aux_output)
     exact_solver.evolve(total_time)
     mps_solver.evolve(total_time)
     
@@ -60,8 +60,9 @@ if __name__=="__main__":
     exact_measurement.measure()
     mps_measurement.measure()
     
-    ers = [float(eee) for eee in exact_measurement.measure_result_list]
-    mrs = [float(mmm) for mmm in mps_measurement.measure_result_list]
+    ers = exact_measurement.measure_result_list
+    mrs = mps_measurement.measure_result_list
+    
     pylab.plot(range(len(ers)), ers)
     pylab.plot(range(len(mrs)), mrs)
     pylab.show()

@@ -15,9 +15,9 @@ class Solver(object):
         self.model = model
         self.output1 = output1
         self.output2 = output2        
-    def Interpreter(self):
+    def interpreter(self):
         raise NotImplementedError("Unimplemented abstract method")
-    def Step(self):
+    def step(self):
         raise NotImplementedError("Unimplemented abstract method")
-    def Evolve(self):
+    def evolve(self):
         raise NotImplementedError("Unimplemented abstract method")

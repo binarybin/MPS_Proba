@@ -7,6 +7,7 @@ Responsible person: Bin Xu
 """
 
 from numpy import ndarray, zeros
+import numpy as np
 
 class Model(object):
     """
@@ -98,6 +99,37 @@ class AngryBoys(Model):
                 self.mps.append(new_mps)
         else:
             raise Exception("Initial condition not supported!")
+            
+    def prepareTransitionalMat(self):
+    	#create sigma_x matrix
+    	sigmax = np.matrix('0 1; 1 0')
+
+    	#create hamiltonian
+    	self.H = self.remain_proba*np.identity(2**self.size) # not changing states
+    	
+    	# changing states
+    	Tmatrix = np.identity(1)
+    	part = np.zeros((2**self.size, 2**self.size))
+    	
+    	for i in range(self.size-1):
+	    	for j in range(self.size):
+	    		if j != i and j != i+1:
+		    		Tmatrix = np.kron(Tmatrix, np.identity(2))
+		    	else:
+			    	Tmatrix = np.kron(Tmatrix, sigmax)
+			
+		part = np.add(part, Tmatrix)
+		Tmatrix = np.identity(1)
+	
+	# add them
+        self.H = np.add(self.H, (1-self.remain_proba)/(self.size-1)*part)
+        
+    def prepareExactInitState(self):
+        self.init_exact = np.zeros((2**self.size, 1))
+        if self.init_state == "all down":
+            self.init_exact[0] = 1
+        else:
+            raise Exception("Init state not supported!")
         
     def __repr__(self):
         return ( "Hamiltonian: "+self.hamiltonian + "\nSystem length = "+str(self.size)+"\nremain_proba = "+str(self.remain_proba) +"\ninitial state: "+self.init_state)

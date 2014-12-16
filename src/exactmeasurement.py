@@ -49,7 +49,7 @@ class ExactMeasurement(Measurement):
                     match = False
             if match:
                 proba += self.solver.results[time][i]
-        return proba
+        return float(proba)
 
     def measureCorrelation(self, task):
         """

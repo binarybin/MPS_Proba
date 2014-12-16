@@ -1,0 +1,290 @@
+%% LyX 2.1.1 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{article}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{amstext}
+\usepackage{amsmath}
+\usepackage{babel}
+\usepackage{courier}
+\usepackage[margin=1in]{geometry}
+
+\begin{document}
+
+\title{Design Document: \\Matrix Product State for Probability Dynamics}
+
+
+\author{Peter Gjeltema (gjeltema@princeton.edu)
+	   \\ Peiqi Wang (peiqiw@princeton.edu)
+	    \\ Jun Xiong (xiong@princeton.edu) 
+	    \\ Bin Xu (binx@princeton.edu) 
+	    \\ Liangsheng Zhang(liangshe@princeton.edu)}
+	    
+\date{\today}
+
+\maketitle
+
+\section{Introduction}
+
+Matrix product state (MPS) is a novel numerical algorithm that is
+widely used in quantum many body physics. For a problem of quantum
+spin chains, the states live in a Hilbert space expanded by the states
+of each spin (referred to as ``orbitals'' hereafter), and the dimension
+of that Hilbert space is $m^{N}$ for a chain of length $N$ where each orbital has $m$ choices. 
+As the dimension of the state space
+grows exponentially with $N$, it is extremely hard to be simulated
+when we deal with a few dozens of sites. 
+
+In 1995, White \cite{white} proposed
+the density matrix renormalization group (DMRG), which proves to be an extremely efficient algorithm for one dimensional systems. Researchers in the next decade were aware of the ubiquitous relation between entanglement and dimensionality which allows the state to be approximated as the product of matrices \cite{schollwock}. Some recent developments include extending the algorithm to higher dimensions\cite{cirac} and critical systems\cite{vidal}.
+
+This inter-departmental collaborative work seeks to apply this algorithm to other interesting problems. The probabilistic nature of quantum mechanics stimulates our study of applying this powerful algorithm in quantum mechanics to difficult problems in probability theory and stochastic processes. An especially interesting example is the Markov process with many degrees of freedom, which also forms an exponentially growing state space. 
+
+We will develop a generic MPS solver and compare our results of some simple applications with that of Monte Carlo and exact transition matrix solutions. We will start with a simple model of the dynamics of human relations (``Angry Boys" model) and, if time permits, we may work on an interesting application pertaining to a financial market crisis. This project is research-based and we hope to start with simple models. Due to the time limitation, this project is focusing on one dimensional models of which the algorithm in physics is well-established, and higher dimensional or highly correlated relationships which are of more interest and realistic relevance will be left to future work.
+\section{Background}
+
+\subsection{The difficult many body problem}
+
+When we have a state as a vector in the Hilbert space, it is expressed
+as
+
+\[
+|\psi\rangle=\sum_{\{\sigma_{i}\}}A_{\{\sigma_{i}\}}|\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}\rangle
+\]
+where $|\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}\rangle$
+is a product basis of the local Hilbert space on different sites.
+
+Applying a linear time-evolution operator $\hat{O}$ on this state,
+the general form of $\hat{O}$ is
+
+\[
+\hat{O}=\sum_{\{\sigma\},\{\sigma'\}}|\sigma'_{1}\sigma'_{2}\sigma'_{3}\cdot\cdot\cdot\sigma'_{N}\rangle\langle\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}|O_{\{\sigma'\}\{\sigma\}}
+\]
+where $\langle\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}|$ is a vector in the dual Hilbert space and $O_{\{\sigma'\}\{\sigma\}}$ is a complex number that represents the amplitude of transition. The application of this operator on the state is naturally written as
+\[
+\hat{O}|\psi\rangle=\sum_{\{\sigma\},\{\sigma'\}}|\sigma'_{1}\sigma'_{2}\sigma'_{3}\cdot\cdot\cdot\sigma'_{N}\rangle\langle\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}|\ O_{\{\sigma'\}\{\sigma\}}\sum_{\{\sigma''_{i}\}}A_{\{\sigma_{''i}\}}|\sigma''_{1}\sigma''_{2}\sigma''_{3}\cdot\cdot\cdot\sigma''_{N}\rangle
+\]
+Using the orthonormal condition of basis, it can be simplified to
+
+\[
+\hat{O}|\psi\rangle=\sum_{\{\sigma_{i}\}\{\sigma'_{i}\}}A_{\{\sigma_{i}\}}O_{\{\sigma'\}\{\sigma\}}|\sigma'_{1}\sigma'_{2}\sigma'_{3}\cdot\cdot\cdot\sigma'_{N}\rangle
+\]
+
+
+Despite its simple form, the actual computation is very difficult since
+we need to perform the summation over $N$ indices of $\sigma_{i}$
+simultaneously, thus gives $m^{N}$ terms. For the simplest case when
+$m=2$ (only two elementary states for one site), $m^{N}\approx10^{9}$
+for $N=30$, taking more than $10$ seconds for one single contraction.
+The chain of $40$ sites is obviously intractable.
+
+
+\subsection{Matrix Product States (MPS)}
+
+To deal with the large number of terms in the contraction, we want
+to effectively split the space. Let's focus on the coefficient $A_{\{\sigma_{i}\}}=A_{\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}}$.
+From a direct point of view, it is a rank-N tensor which has N indices,
+but we can group some indices so that it becomes $A_{\sigma_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
+with only $2$ indices where the first has $m$ possible values and
+the second has $m^{N-1}$. Grouping $N-1$ indices means making a
+bijection map from $N-1$ numbers varying between $1$ and $m$ to
+a single integer varying from $1$ to $m^{N-1}$. This re-indicing
+trick is crucial in MPS algorithms.
+
+We can then treat this 2 indices object $A_{\sigma_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
+as a matrix with $\sigma_{1}$ the row index and $(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})$
+the column index, thus forming a $m\times m^{N-1}$ matrix. Applying
+singular value decomposition (SVD) on this matrix gives 
+\[
+A_{\sigma_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=U_{m_{1}}^{\sigma_{1}}S_{m_{1}m_{2}}V_{m_{2}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=U_{m_{1}}^{\sigma_{1}}\tilde{V}_{m_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}
+\]
+where $U$ is a $m\times m$ unitary matrix and $S$ is a $m\times m$
+diagonal matrix with non-negative diagonal elements arranged in descending
+order. We can apply a similar procedure on $\tilde{V}_{m_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
+by re-arranging indices as $\tilde{V}_{m_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=\tilde{V}_{(m_{1}\sigma_{2})(\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
+and applying a similar SVD:
+
+\[
+\tilde{V}_{(m_{1}\sigma_{2})(\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=U_{(m_{1}\sigma_{2})m_{2}}S_{m_{2}m_{2}'}V_{m_{2}'(\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=U_{m_{1}m_{2}}^{\sigma_{2}}\tilde{V}_{m_{2}(\sigma_{3}\cdot\cdot\cdot\sigma_{N})}
+\]
+where the second ``$=$'' reshapes the $U$ matrix and multiplied
+the $S$ and $V$ matrices. 
+
+Noticing that $\tilde{V}_{m_{2}(\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
+is almost the same as $\tilde{V}_{m_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
+except for having one fewer $\sigma_{i}$, we can apply this procedure
+inductively and write the original coefficient tensor as
+
+\[
+A_{\{\sigma_{i}\}}=U_{m_{1}}^{\sigma_{1}}U_{m_{1}m_{2}}^{\sigma_{2}}U_{m_{2}m_{3}}^{\sigma_{3}}\cdot\cdot\cdot U_{m_{N-1}m_{N}}^{\sigma_{N}}
+\]
+This form is called the matrix product state, and $\sigma_{i}$'s
+are called ``physical indices'' while $m_{i}$'s are called ``auxiliary
+indices''. It worths noting that, in general, operators can also
+be decomposed in this way, although it is usually more convenient
+to directly construct operators in matrix product form. This representation
+is extremely convenient since each matrix $U$ contains only one physical
+index and then the application of a matrix product linear operator
+on a matrix product state only involves the contraction of a few indices.
+
+For example, if we have a linear operator $O_{\{\sigma'\}\{\sigma\}}=O_{n_{1}}^{\sigma'_{1}\sigma_{1}}O_{n_{1}n_{2}}^{\sigma'_{2}\sigma_{2}}O_{n_{2}n_{3}}^{\sigma'_{3}\sigma_{3}}\cdot\cdot\cdot O_{n_{N-1}n_{N}}^{\sigma'_{N}\sigma_{N}}$
+then applying this operator on the MPS is actually the contraction
+on $m$, $n$ and $\sigma_{i}$ space. The traditional way corresponds
+to first contracting $m$ and $n$ spaces and then $\sigma$ but this
+novel method contracts the $\sigma$ space first and then $m$ and
+$n$. The specific order of contraction is:
+\begin{itemize}
+\item Compute $\sum_{\sigma_{i}}O_{n_{i-1}n_{i}}^{\sigma'_{i}\sigma_{i}}A_{m_{i-1}m_{i}}^{\sigma_{i}}=M_{n_{i-1}n_{i}m_{i-1}m_{i}}^{\sigma'_{i}}$
+for all $i$'s
+\item $\sum_{n_{1}m_{1}}M_{n_{1}m_{1}}^{\sigma'_{1}}M_{n_{1}n_{2}m_{1}m_{2}}^{\sigma'_{2}}=\tilde{M}_{n_{2}m_{2}}^{\sigma'_{1}\sigma'_{2}}$
+\item $\sum_{n_{2}m_{2}}\tilde{M}{}_{n_{2}m_{2}}^{\sigma'_{1}\sigma'_{2}}M_{n_{2}n_{3}m_{2}m_{3}}^{\sigma'_{3}}=\tilde{M}_{n_{3}m_{3}}^{\sigma'_{1}\sigma'_{2}\sigma'_{3}}$
+\item keep doing this, until we finish the multiplication of all these objects
+and get $\tilde{M}^{\sigma'_{1}\sigma'_{2}\cdot\cdot\cdot\sigma'_{N}}=A_{\sigma'_{1}\sigma'_{2}\cdot\cdot\cdot\sigma'_{N}}$
+which is the final result, coefficients of the new state $|\psi'\rangle=\sum_{\{\sigma'_{i}\}}A_{\sigma'_{1}\sigma'_{2}\cdot\cdot\cdot\sigma'_{N}}|\sigma_{1}\sigma_{2}\text{\ensuremath{\cdot}}\text{\ensuremath{\cdot}}\text{\ensuremath{\cdot}}\sigma_{N}\rangle$.
+\end{itemize}
+
+\subsection{Approximation}
+
+You may wonder why our algorithm seems to transform an exponentially
+scaling problem to polynomial time; the reason is that we hide something.
+We did not talk about the dimension of auxiliary space $m_{i}$ and
+$n_{i}$, and they should grow exponentially. The method is useful
+only when the interaction is local or short-range, which means the
+degree of freedom on one site only effectively interacts with some
+of its neighbors. It is proven that in this case, the diagonal terms
+in $S$ matrix decay exponentially and we can make an effective cut-off
+in auxiliary space, keeping only a finite number $\chi$ dimensions
+so that all $U$'s are at most $\chi\times\chi$ dimensional matrices.
+$\chi$ is called the bound dimension. The effectiveness of this algorithm
+relies deeply on that we do not need a large $\chi$ to achieve accurate
+results. It is proven that in all 1-dimensional problems away from critical
+points, $\chi$ does not grow with system size (the length); in critical
+1-dimensional models, $\chi\propto N^{\lambda}$ (polynomial) and
+in 2D, $\chi\propto\exp W$ which is the exponential of short dimension.
+
+
+\subsection{Matrix Product Operators (MPO)}
+The Hamiltonian in quantum mechanics, or equivalently the transitional matrix in stochastic process, can be written as a series of matrix product operators where each matrix only applies on one site. A lot of examples of various types of interactions are developed and more details will be shown in our final report.
+
+
+%\section{Shooting the moon}
+
+%To be finished. I will describe the fancy applications of studying
+%the probability distribution of several variables with somehow a ``1D''
+%correlation. The distribution of a window of several dozens of sampling
+%points (path probability distribution) can follow a stochastic differential/difference
+%equation that can be treated much more efficiently with this algorithm.
+%--I may need to put this part at the end of our final report.
+
+
+%\section{Get down to earth}
+
+%For this course project, we can do a more preliminary level work.
+%My crude plan is to:
+%\begin{itemize}
+%\item Make a model which may not be very realistic but is simple enough
+%so that we can reduce it to a differential/difference equation that
+%depends on multiple variables (degrees of freedom). We need to have
+%more discussions on which model we want to write down. An optimization
+%problem may be a nice choice.
+%\item Perform imaginary time evolution on a random MPS and show that it
+%converges to a optimized state.
+%\item Use Monte Carlo to find the optimized state. This will validate our
+%algorithm.
+%\item It's likely that our algorithm is slower than Monte Carlo in optimization
+%problems but let's not worry about this, we can claim that this method
+%is promising because we can do real time evolution in the future.
+%\item There is a small chance that our algorithm gives bad results... But
+%I don't think it's likely, anyway, we can increase the bound dimension
+%and limit ourselves to small system size if we have to hand in something
+%for the term project.\end{itemize}
+
+\section{Project Overview}
+In this project, we would like to extend the usage of MPS and MPO to problems concerning stochastic processes. Particularly, we will consider the time evolution of a probability distribution expressed in a vector form, where the dynamics is specified by a probability transition matrix.
+
+\subsection{Model}
+We will be considering a one dimensional problem with $n$ agents on a line at positions $i=1,2,\cdots,n$. Each agent has two states $(1,0)^T$ and $(0,1)^T$, so the state space is of dimension $2^n$, and the dynamics at each time step is determined by the following probability transition matrix:
+\begin{displaymath}
+H = pI + (1-p)\sum_{i=1}^{n-1}\frac{1}{n-1}\sigma_i^x\otimes\sigma_{i+1}^x,
+\end{displaymath}
+where $I$ is a $2^n\times2^n$ identity matrix and 
+\begin{displaymath}
+\sigma_i^x = 
+\begin{pmatrix}
+0 & 1 \\
+1 & 0
+\end{pmatrix}
+\end{displaymath}
+operating on the 2-state space at position $i$. Intuitively, we can interpret the two states of each agent as "angry" $(1,0)^T$ and "calm" $(0,1)^T$, and the transition matrix describes the interactions among agents in terms of neighboring pairs. The chance such that the state remains untouched is $p$ and otherwise, with a probability $(1-p)/(N-1)$, one of the pairs of agents will change their states.  We will start with the state where every agent is calm, and try to compute various joint probabilities at later times.
+
+\subsection{Implementation}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{flow_chart.PNG}
+\caption{The flow chart of our program.}
+\label{fig:flow_chart}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.4\textwidth]{class_diagram.png}
+\caption{A bird view of our classes.}
+\label{fig:class_diagram}
+\end{center}
+\end{figure}
+
+
+The implementation is summarized in Fig.~\ref{fig:flow_chart}. The model will be implemented in two ways. The classes used are described in Fig.~\ref{fig:class_diagram}.
+
+\subsubsection{Exact Solution}
+
+An exact solution may be obtained for the proposed system. Because the dimension of state space grows exponentially, implementing such a solution becomes too computationally costly when dealing with a few dozen spins and/or chain sites. Nonetheless, an exact solution bounded by reasonably-sized state spaces will be needed to corroborate results obtained through the MPS algorithm.
+To generate an exact solution for reasonably-sized state-spaces, a class \texttt{Exact} will be implemented. The class will contain two functions.  A function \texttt{Interpreter} will read data contained in an instance of the class \texttt{Model}, including the length of the chain and local dimensions for each chain site. This data will be used to construct a transitional matrix, to be implemented as a sparse matrix, which will be used for simulating the current state of the system. The interpreter will then call on the \texttt{Step} function to solve for the state by stepping in discrete time.
+Additionally, a Monte Carlo simulation can be used to solve this problem. If time permits, a Monte Carlo simulation of the system will be implemented to serve as an addition comparator to the MPS algorithm.
+
+
+\subsubsection{MPS class}
+Parallel to the class \texttt{Exact}, we construct a class named \texttt{MPS} to store the MPS representation of the current state, to hold the MPO representation of the dynamics of the system and to comprise several functions which are necessary in updating the current state. The \texttt{MPS} class will include the following:
+\\[3mm]
+\noindent\textbf{Member data} We will have the current state in a variable named \texttt{MPState} which is a 3-d array storing $M^{\sigma_i}_{a_{i-1},a_i}$. The operator $O^{\sigma_i, \sigma'_i}_{n_{i-1}, n_i}$ will be stored in a variable named \texttt{MPO} which is a 4-d array. In addition, we will store the time of the system in the variable \texttt{T}.
+\\[3mm]
+\noindent\textbf{Constructor} The constructor will take a model of type \texttt{Model} and an initial state as argument and initilize the members \texttt{MPState}, \texttt{MPO} and \texttt{T}. In the first versions, we only focus on certain well-defined models.
+\\[3mm]
+\noindent\textbf{Methods} As is shown in the flow chart, to update the state from time $t$ to $t+1$, one must first apply the MPO to the MPS and then compress the state. The reason why the compression step is necessary is that after applying MPO to MPS, the resulting MPS will have a greater auxiliary  degrees of freedom. The compression step consists of projecting the resulting MPS (which is of higher dimension) back to the initial space (of a lower dimension). We shall write the routine \texttt{Step} responsible for applying MPO and updating the current state \texttt{MPState}. This routine will call \texttt{Compression} to make sure that the new state has the desired degrees of freedom.
+Both \texttt{Step} and \texttt{Compression} will involve some basic operations of multiplication of arrays and summing over a certain number of indices (similar to matrix multiplication). We shall implement these basic operations first, so \texttt{Step} and \texttt{Compression} can call these routines.
+Note that if we would like to calculate the expectation of a physical quatity, or the marginal probability of a physical states, we have to do the "overlapping" operation of two MPS's. This again involves a number of basic operations defined in the class \texttt{MPS}. So the members in the class \texttt{Measurement} which handles the evaluation of expectations and probabilities, should be able to call the routines in the class \texttt{MPS}.
+\\[3mm]
+The \texttt{Compression} function of MPS will work iteratively. To initialize for the compression, we will apply SVD to the MPS representation of the states, and then truncate the decomposed matrices with $\chi$ largest single values retained. The following steps of compression will minimize $||\psi^i-\psi^{i-1} ||^{2}$ iteratively, where $\psi^{i-1}$ is the state from the previous step while $\psi^i$ is the state obtained for the new $ith$ step. The extrema condition in minimizing $||\psi^i-\psi^{i-1} ||^{2}$ will require solving linear equations to get the new coefficients in the new matrices of the $ith$ step. After that the new state will also be normalized.
+\\[3mm]
+
+\subsubsection{Measurement Class}
+The \texttt{Measurement} class includes functions for calculating the expectation of a given operator, the conditional probability of certain states, and possibly the correlation functions of different time steps. Both the conditional probability and correlation function may require us to store the MPS at each step. By calling this storage, we don't need to rerun the MPS procedure to calculate new physical quantities. And this is one of the advantages of MPS over Monte Carlo method. In the simplest form, the user can specify a set of states/operators through a defined structure, which are then combined with final state of the system to give (conditional) probabilities. If time permitted, we will try to extend the measurement to include time-dependent information.
+\vspace{3mm}
+
+\subsection{Milestones}
+\noindent\textbf{Alpha version:} To be released on 12/15/2014, written in Python. It will include the following work:
+\begin{itemize}
+\item  Model and Interface will include user specified information and determine the model used, number of steps, physical quantities to measure. Headed by Bin Xu.
+\item  The \texttt{measurement} of interesting variables, such as the average values and various correlation functions is defined in the measurement class. Headed by Peiqi Wang.
+\item  The \texttt{Compression} function uses the building blocks in \texttt{MPS} to compress the new MPS matrices in the new step. Headed by Liangsheng Zhang and Jun Xiong.
+\item  The implementation of the \texttt{Measurement} will implement different functions to calculate physical properties . Headed by Liangsheng Zhang and Jun Xiong.
+\item  The \texttt{Exact} class calculates the exact time evolution of the initial state for smaller sizes. It may use the functions in \texttt{Measurement} to calculate physical properties. Headed by Peter Gjeltema.
+\end{itemize}
+\noindent\textbf{Beta version:} To be released on 01/15/2015. Several interesting work will include:
+\begin{itemize}
+\item Study other interesting models that are more practical, and/or more difficult.
+\item Implement the algorithm in C++ to gain a speed-up.
+\item If time permits, we can try some basic ideas of a time evolving PEPS algorithm to study 2-dimensional problems.
+\end{itemize}
+
+\begin{thebibliography}{99}
+\bibitem{white} S. R. White, {\it Physical Review Letters} {\bf 69}, 2863 (1992)
+\bibitem{schollwock} Ulrich Schollwoeck, {\it Annals of Physics} {\bf 326}, 96 (2011)
+\bibitem{cirac} Verstraete, F., and J. I. Cirac, (2004), arXiv:cond-mat/0407066v1
+\bibitem{vidal}G. Evenbly, G. Vidal, {\it J Stat Phys} (2011) {\bf 145:} 891-918
+\end{thebibliography}
+\end{document}
+

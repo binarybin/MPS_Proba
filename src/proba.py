@@ -29,7 +29,7 @@ Code style conventions:
 """
 
 import sys
-from model import AngryBoys
+from angryboys import AngryBoys
 from exactsolver import ExactSolver
 from mpssolver import MpsSolver
 from exactmeasurement import ExactMeasurement

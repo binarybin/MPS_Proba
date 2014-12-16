@@ -30,6 +30,7 @@ Code style conventions:
 
 import sys
 from angryboys import AngryBoys
+from radiatingboys import RadiatingBoys
 from exactsolver import ExactSolver
 from mpssolver import MpsSolver
 from exactmeasurement import ExactMeasurement
@@ -44,9 +45,9 @@ if __name__=="__main__":
     main_output = sys.stdout # the output channel for important results that will be shown in the final run
     aux_output = sys.stdout # the output channel for auxiliary information that may be interesting for dubugging but not in the final run
     
-    angry_boys = AngryBoys(size = 10, remain_proba = 0.2, init_state = "all down", output1 = main_output, output2 = aux_output)
+    angry_boys = RadiatingBoys(size = 10, remain_proba = 0.1, nearest_neighbour_proba = 0.4, second_neighbour_proba = 0.5, init_state = "all down", output1 = main_output, output2 = aux_output)
     exact_solver = ExactSolver(model = angry_boys, output1 = main_output, output2 = aux_output)
-    mps_solver = MpsSolver(model = angry_boys, bound_dimension = 10, output1 = main_output, output2 = aux_output)
+    mps_solver = MpsSolver(model = angry_boys, bound_dimension = 5, output1 = main_output, output2 = aux_output)
     exact_solver.evolve(total_time)
     mps_solver.evolve(total_time)
     

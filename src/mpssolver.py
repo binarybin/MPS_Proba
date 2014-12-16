@@ -46,7 +46,7 @@ class MpsSolver(Solver):
         self.interpreter()
 
     def interpreter(self):
-        if self.model.model_type == "AngryBoys":
+        if self.model.model_type == "AngryBoys" or self.model.model_type == "RadiatingBoys":
             self.mpo = self.model.mpo
             self.mps = self.model.mps
             #when initializing, put mpsc the same as mps so we can apply mpo on it

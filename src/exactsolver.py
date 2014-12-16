@@ -7,8 +7,9 @@ Responsible person: Peter Gjeltema
 """
 from solver import Solver
 import numpy as np
-from model import AngryBoys
-from deepcopy import deepcopy
+from angryboys import AngryBoys
+from radiatingboys import RadiatingBoys
+from copy import deepcopy
 
 class ExactSolver(Solver):
     """
@@ -25,7 +26,7 @@ class ExactSolver(Solver):
         self.interpreter()
     
     def interpreter(self):
-        if self.model.model_type == "AngryBoys":
+        if self.model.model_type == "AngryBoys" or self.model.model_type == "RadiatingBoys":
             self.H = self.model.H
             self.state = deepcopy(self.model.init_exact)
             self.results.append(self.state)

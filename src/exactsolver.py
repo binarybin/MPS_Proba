@@ -9,6 +9,7 @@ from solver import Solver
 import numpy as np
 from angryboys import AngryBoys
 from radiatingboys import RadiatingBoys
+from exponentialboys import ExponentialBoys
 from copy import deepcopy
 
 class ExactSolver(Solver):
@@ -26,7 +27,7 @@ class ExactSolver(Solver):
         self.interpreter()
     
     def interpreter(self):
-        if self.model.model_type == "AngryBoys" or self.model.model_type == "RadiatingBoys":
+        if self.model.model_type in self.boy_models:
             self.H = self.model.H
             self.state = deepcopy(self.model.init_exact)
             self.results.append(self.state)

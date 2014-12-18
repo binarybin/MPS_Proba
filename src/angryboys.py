@@ -14,7 +14,7 @@ class AngryBoys(Model):
     """
     A probablistic model that describes the model in human language and gives some parameters.
     """
-    
+
     def __init__(self, size, remain_proba, init_state, output1, output2):
         self.size = size
         self.remain_proba = remain_proba
@@ -31,24 +31,24 @@ class AngryBoys(Model):
     def prepareMpo(self):
         #initialize the MPO
         self.mpo = []
-        
-        mpo_left = zeros(shape = (2, 2, 1, 3), dtype = float)            
+
+        mpo_left = zeros(shape = (2, 2, 1, 3), dtype = float)
         mpo_middle = zeros(shape = (2, 2, 3, 3), dtype = float)
         mpo_right = zeros(shape = (2, 2, 3, 1), dtype = float)
-            
+
         q = (1.0-self.remain_proba)/(self.size - 1.0)
         p = self.remain_proba
-            
+
         # remember our convention: phys_in, phys_out, aux_l, aux_r
         # mpo_left = [pI, qSx, I]
-            
+
         mpo_left[0, 0, 0, 0] = p
         mpo_left[1, 1, 0, 0] = p
         mpo_left[1, 0, 0, 1] = q
         mpo_left[0, 1, 0, 1] = q
         mpo_left[1, 1, 0, 2] = 1
         mpo_left[0, 0, 0, 2] = 1
-            
+
         # mpo_middle = [I, 0, 0]
         #              [Sx, 0, 0]
         #              [0, qSx, I]
@@ -60,21 +60,21 @@ class AngryBoys(Model):
         mpo_middle[1, 1, 0, 0] = 1
         mpo_middle[1, 0, 1, 0] = 1
         mpo_middle[0, 1, 1, 0] = 1
-            
+
         # mpo_right = [I, Sx, 0].transpose
-            
+
         mpo_right[0, 0, 0, 0] = 1
         mpo_right[1, 1, 0, 0] = 1
         mpo_right[1, 0, 1, 0] = 1
         mpo_right[0, 1, 1, 0] = 1
-            
+
         # store the list of mpo's
-            
+
         self.mpo.append(mpo_left)
         for i in range(self.size-2):
             self.mpo.append(mpo_middle)
         self.mpo.append(mpo_right)
-        
+
     def prepareMps(self):
         self.mps = []
         if self.init_state == "all down":
@@ -96,32 +96,41 @@ class AngryBoys(Model):
                 self.mps.append(new_mps)
         else:
             raise Exception("Initial condition not supported!")
-            
+
     def prepareTransitionalMat(self):
     	#create sigma_x matrix
     	sigmax = np.matrix('0 1; 1 0')
 
     	#non changing channel
-    	self.H = self.p0*np.identity(2**self.size) # not changing states
-    	
-    	# nearest-neighbour changing channel	
-    	for i in range(self.size-1):
-    	    Tmatrix = np.identity(1)
-	    for j in range(self.size):
-	    	if j == i or j == i+1:
+    	self.H = self.remain_proba*np.identity(2**self.size) # not changing states
+
+    	# nearest-neighbour changing channel
+        for i in range(self.size-1):
+            Tmatrix = np.identity(1)
+            for j in range(self.size):
+                if j == i or j == i+1:
                     Tmatrix = np.kron(Tmatrix, sigmax)
-	    	else:
-                    Tmatrix = np.kron(Tmatrix, np.identity(2))	
-		self.H = np.add(self.H, Tmatrix * self.p1/(self.size -1))
-        
+                else:
+                    Tmatrix = np.kron(Tmatrix, np.identity(2))
+            self.H = np.add(self.H, Tmatrix * (1-self.remain_proba)/(self.size - 1))
+
+#    	for i in range(self.size-1):
+#    	    Tmatrix = np.identity(1)
+#	    for j in range(self.size):
+#	    	  if j == i or j == i+1:
+#                    Tmatrix = np.kron(Tmatrix, sigmax)
+#	    	  else:
+#                    Tmatrix = np.kron(Tmatrix, np.identity(2))
+#        self.H = np.add(self.H, Tmatrix * (1-self.remain_proba)/(self.size -1))
+#        print self.H
+
     def prepareExactInitState(self):
         self.init_exact = np.zeros((2**self.size, 1))
         if self.init_state == "all down":
             self.init_exact[0] = 1
         else:
             raise Exception("Init state not supported!")
-        
+
     def __repr__(self):
         return ( "Hamiltonian: "+self.hamiltonian + "\nSystem length = "+str(self.size)+"\nremain_proba = "+str(self.remain_proba) +"\ninitial state: "+self.init_state)
-    
-    
+

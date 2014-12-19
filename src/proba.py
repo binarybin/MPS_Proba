@@ -42,24 +42,54 @@ if __name__=="__main__":
     """
     The main call of this program.
     """
-    total_time = 20
+    total_time = 100
     main_output = sys.stdout # the output channel for important results that will be shown in the final run
     aux_output = sys.stdout # the output channel for auxiliary information that may be interesting for dubugging but not in the final run
 
-    angry_boys = AngryBoys(size = 10, remain_proba = 0.1, init_state = "all down", output1 = main_output, output2 = aux_output)
+    angry_boys = AngryBoys(size = 20, remain_proba = 0.1, init_state = "all down", output1 = main_output, output2 = aux_output)
 #    angry_boys = RadiatingBoys(size = 10, remain_proba = 0.1, nearest_neighbour_proba = 0.4, second_neighbour_proba = 0.5, init_state = "all down", output1 = main_output, output2 = aux_output)
 #    angry_boys = ExponentialBoys(size = 10, J = 0.5, K = 1, init_state = "all down", output1 = main_output, output2 = aux_output)
+
+    mrs = []
+    evolve_time = []
+
+    import time
+    for i in range(2,10):
+        start_time = time.time()
+        print "bound dimension: ", i
+        print "Solver Initialized"
+        mps_solver = MpsSolver(model = angry_boys, bound_dimension = i, output1 = main_output, output2 = aux_output)
+        print "Evolve"
+        mps_solver.evolve(total_time)
+        print "Measure"
+        mps_measurement = MpsMeasurement(mps_solver, main_output, aux_output)
+        mps_measurement.addMeasureTask(("Proba", [(5, "up"), (-1, "down")]))
+        mps_measurement.measure()
+        mrs.append(mps_measurement.measure_result_list[0])
+        evolve_time.append(time.time()-start_time)
+        print "Execution time: ", evolve_time[-1]
+
+    pylab.figure(1)
+    pylab.plot(range(2,10), mrs)
+
+    pylab.figure(2)
+    pylab.plot(range(2,10),evolve_time)
+    pylab.show()
+
+"""
     exact_solver = ExactSolver(model = angry_boys, output1 = main_output, output2 = aux_output)
-    mps_solver = MpsSolver(model = angry_boys, bound_dimension = 5, output1 = main_output, output2 = aux_output)
+    mps_solver = MpsSolver(model = angry_boys, bound_dimension = 10, output1 = main_output, output2 = aux_output)
+
     exact_solver.evolve(total_time)
     mps_solver.evolve(total_time)
 
     exact_measurement = ExactMeasurement(exact_solver, main_output, aux_output)
     mps_measurement   = MpsMeasurement(mps_solver, main_output, aux_output)
 
+
     for i in range(total_time):
-        exact_measurement.addMeasureTask(("Proba", i, [(5, "up")]))
-        mps_measurement.addMeasureTask(("Proba", i, [(5, "up")]))
+        exact_measurement.addMeasureTask(("Proba", i, [(5, "up"), (9,"down")]))
+        mps_measurement.addMeasureTask(("Proba", i, [(5, "up"), (-1, "down")]))
 
     exact_measurement.measure()
     mps_measurement.measure()
@@ -71,3 +101,5 @@ if __name__=="__main__":
     pylab.plot(range(len(mrs)), mrs, label = "mps")
     pylab.legend(loc="lower right")
     pylab.show()
+"""
+

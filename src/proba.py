@@ -46,7 +46,7 @@ if __name__=="__main__":
     main_output = sys.stdout # the output channel for important results that will be shown in the final run
     aux_output = sys.stdout # the output channel for auxiliary information that may be interesting for dubugging but not in the final run
 
-    angry_boys = AngryBoys(size = 20, remain_proba = 0.1, init_state = "all down", output1 = main_output, output2 = aux_output)
+    angry_boys = AngryBoys(size = 200, remain_proba = 0.1, init_state = "all down", output1 = main_output, output2 = aux_output)
 #    angry_boys = RadiatingBoys(size = 10, remain_proba = 0.1, nearest_neighbour_proba = 0.4, second_neighbour_proba = 0.5, init_state = "all down", output1 = main_output, output2 = aux_output)
 #    angry_boys = ExponentialBoys(size = 10, J = 0.5, K = 1, init_state = "all down", output1 = main_output, output2 = aux_output)
 
@@ -54,7 +54,7 @@ if __name__=="__main__":
     evolve_time = []
 
     import time
-    for i in range(2,10):
+    for i in range(10,13):
         start_time = time.time()
         print "bound dimension: ", i
         print "Solver Initialized"

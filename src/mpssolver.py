@@ -184,14 +184,17 @@ class MpsSolver(Solver):
     def initializeMpscVar(self):
         self.mpsc=[];
         #new_mps=np.zeros(shape=(n,1,d),dtype=float);
-        new_mps=np.random.rand(self.n,1,self.bound_dimension);
+        #new_mps=np.random.rand(self.n,1,self.bound_dimension);
+        new_mps=np.ones(shape=(self.n,1,self.bound_dimension),dtype=float)
         self.mpsc.append(new_mps)
         for i in range(2,self.L):
             #new_mps=np.zeros(shape=(n,d,d),dtype=float);
-            new_mps=np.random.rand(self.n,self.bound_dimension,self.bound_dimension);
+            #new_mps=np.random.rand(self.n,self.bound_dimension,self.bound_dimension);
+            new_mps=np.ones(shape=(self.n,self.bound_dimension,self.bound_dimension),dtype=float)
             self.mpsc.append(new_mps)
         #new_mps=np.zeros(shape=(2,d,1),dtype=float)
-        new_mps=np.random.rand(self.n,self.bound_dimension,1);
+        #new_mps=np.random.rand(self.n,self.bound_dimension,1)
+        new_mps=np.ones(shape=(self.n,self.bound_dimension,1),dtype=float)
         self.mpsc.append(new_mps)
         #right-normalizae the states
         for i in range(self.L-1):

@@ -49,7 +49,7 @@ if __name__=="__main__":
 #    angry_boys = RadiatingBoys(size = 10, remain_proba = 0.1, nearest_neighbour_proba = 0.4, second_neighbour_proba = 0.5, init_state = "all down", output1 = main_output, output2 = aux_output)
     angry_boys = ExponentialBoys(size = 10, J = 0.5, K = 1, init_state = "all down", output1 = main_output, output2 = aux_output)
     exact_solver = ExactSolver(model = angry_boys, output1 = main_output, output2 = aux_output)
-    mps_solver = MpsSolver(model = angry_boys, bound_dimension = 2, output1 = main_output, output2 = aux_output)
+    mps_solver = MpsSolver(model = angry_boys, bound_dimension = 5, output1 = main_output, output2 = aux_output)
     exact_solver.evolve(total_time)
     mps_solver.evolve(total_time)
     

@@ -79,7 +79,9 @@ class MpsSolver(Solver):
     def step(self):
         self.t=self.t+1
         self.contraction()
-        self.compressionVariational()
+#        self.compressionSVDSweepToRightTest()
+        self.compressionSVDSweepToLeftTest()
+#        self.compressionVariational()
         self.normalizeProba()
         self.results.append(self.mpsc)
 
@@ -112,49 +114,57 @@ class MpsSolver(Solver):
         self.mpsc.append(mps_current)
 
     def compressionSVDSweepToRightTest(self):
-        self.mpsc[0] = self.mps[0]
+        self.mpsc= []
+        self.mpsc.append(self.mps[0])
+#       The below can only be used if it is guaranteed that the bound dimension between first and second site will not grow
+#        if self.L>1:
+#            self.mpsc.append(self.mps[1])
         for i in range(0, self.L-1):
-            A=np.reshape(self.mpsc[i],(self.mpsc[i].shape[0]*self.mpsc[i].shape[1],self.mpsc[i].shape[2]))
+            A=np.reshape(self.mpsc[-1],(self.mpsc[-1].shape[0]*self.mpsc[-1].shape[1],self.mpsc[-1].shape[2]))
             U, s, V=np.linalg.svd(A, full_matrices=False)
 
             shape_left=self.mps[i].shape[1]
             shape_right=self.mps[i].shape[2]
             #these are the dimensions of the original matrix
-            s_dim=min(self.bound_dimension, min(shape_left,shape_right))
+            s_dim= self.bound_dimension
 
             U=U[:, 0:s_dim]
             s1=np.diag(s)[0:s_dim, 0:s_dim]
             V=V[0:s_dim, :]
 
-            self.mpsc[i]=np.reshape(U,(A.shape[0],A.shape[1],U.shape[1]))
+            self.mpsc[-1]=np.reshape(U,(self.mpsc[-1].shape[0],self.mpsc[-1].shape[1],U.shape[1]))
 
-            B=np.dot(np.diag(s1),V)
-            self.mpsc[i+1]=np.tensordot(self.mps[i+1],B,axes=([1],[1]))
-            self.mpsc[i+1]=np.swapaxes(self.mpsc[i+1],1,2)
+            B=np.dot(s1,V)
+            self.mpsc.append( np.tensordot(self.mps[i+1],B,axes=([1],[1])) )
+            self.mpsc[-1]=np.swapaxes(self.mpsc[-1],1,2)
 
     def compressionSVDSweepToLeftTest(self):
-        self.mpsc[self.L-1] = self.mps[self.L-1]
-        for i in range(self.L-2, 0, -1):
-            A=np.swapaxes(self.mpsc[i],1,2)
-            A=np.reshape(self.mpsc[i],(self.mpsc[i].shape[0]*self.mpsc[i].shape[1],self.mpsc[i].shape[2]))
+        # First store mpsc in a reverse order
+        self.mpsc = []
+        self.mpsc.append(self.mps[self.L-1])
+        for i in range(self.L-1, 0, -1):
+            A=np.swapaxes(self.mpsc[-1],1,2)
+            A=np.reshape(A,(A.shape[0]*A.shape[1],A.shape[2]))
             U, s, V=np.linalg.svd(A, full_matrices=False)
 
             shape_left=self.mps[i].shape[1]
             shape_right=self.mps[i].shape[2]
             #these are the dimensions of the original matrix
-            s_dim=min(self.bound_dimension, min(shape_left,shape_right))
+
+            """ Do we really need shape_left and shape_right? """
+            s_dim= self.bound_dimension
 
             U=U[:, 0:s_dim]
             s1=np.diag(s)[0:s_dim, 0:s_dim]
             V=V[0:s_dim, :]
 
-            self.mpsc[i]=np.reshape(U,(A.shape[0],A.shape[1],U.shape[1]))
-            self.mpsc[i]=np.swapaxes(self.mpsc[i],1,2)
+            """ Is leftNormalize wrong here about reshaping? """
+            self.mpsc[-1]=np.reshape(U,(self.mpsc[-1].shape[0],self.mpsc[-1].shape[2],U.shape[1]))
+            self.mpsc[-1]=np.swapaxes(self.mpsc[-1],1,2)
 
-            B=np.dot(np.diag(s1),V)
-            self.mpsc[i-1]=np.tensordot(self.mps[i-1],B,axes=([2],[1]))
-
-
+            B=np.dot(s1,V)
+            self.mpsc.append( np.tensordot(self.mps[i-1],B,axes=([2],[1])) )
+        self.mpsc.reverse()
 
     def compressionSVDSweepToLeft(self):
         # sweep from Right to left and compress each matrix in mps

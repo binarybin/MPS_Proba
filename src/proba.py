@@ -54,7 +54,8 @@ if __name__=="__main__":
     evolve_time = []
 
     import time
-    for i in range(10,13):
+    run_list = range(10,13)
+    for i in run_list:
         start_time = time.time()
         print "bound dimension: ", i
         print "Solver Initialized"
@@ -70,10 +71,10 @@ if __name__=="__main__":
         print "Execution time: ", evolve_time[-1]
 
     pylab.figure(1)
-    pylab.plot(range(2,10), mrs)
+    pylab.plot(run_list, mrs)
 
     pylab.figure(2)
-    pylab.plot(range(2,10),evolve_time)
+    pylab.plot(run_list,evolve_time)
     pylab.show()
 
 """

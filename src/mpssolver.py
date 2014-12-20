@@ -11,6 +11,8 @@ from solver import Solver
 ##from model import AngryBoys
 from copy import deepcopy
 import numpy as np
+import math
+
 
 class MpsSolver(Solver):
     """
@@ -306,21 +308,21 @@ class MpsSolver(Solver):
         error=10000
         ##Direction of previous sweep. 0 means left to right and 1 means right to left
         last_direction=1
-        while (error>self.epsil):
+        for sweep in range(1):
             if (last_direction==1):
                 last_cpr_err=self.cpr_err
                 self.compressionSweepLeftRight()
                 self.cpr_err=self.cpr_err+mps_norm
-                #print(self.cpr_err)
-                #self.output2.write('L2 distance = '+str(self.cpr_err)+'\n')
+                print(math.sqrt(abs(self.cpr_err)*self.L)) # approximately the L1 norm
                 error=abs(last_cpr_err-self.cpr_err)
+#                last_direction = 0
             elif (last_direction==0):
                 last_cpr_err=self.cpr_err
                 self.compressionSweepRightLeft()
                 self.cpr_err=self.cpr_err+mps_norm
-                #print(self.cpr_err)
-                #self.output2.write('L2 distance = '+str(self.cpr_err)+'\n')
+                print(math.sqrt(abs(self.cpr_err)*self.L)) # approximately the L1 norm
                 error=abs(last_cpr_err-self.cpr_err)
+#                last_direction = 1
 
     def normalizeProba(self):
         result=np.sum(self.mpsc[0],axis=0)

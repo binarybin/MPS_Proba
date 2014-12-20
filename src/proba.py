@@ -42,17 +42,17 @@ if __name__=="__main__":
     """
     The main call of this program.
     """
-    total_time = 100
+    total_time = 200
 
-    angry_boys = AngryBoys(size = 10, remain_proba = 0.1, init_state = "all down")
+    angry_boys = AngryBoys(size = 100, remain_proba = 0.1, init_state = "all down")
  #   angry_boys = RadiatingBoys(size = 100, remain_proba = 0.1, nearest_neighbour_proba = 0.4, second_neighbour_proba = 0.5, init_state = "all down")
  #   angry_boys = ExponentialBoys(size = 200, J = 0.5, K = 0.5, init_state = "all down")
-    """
+    
     mrs = []
     evolve_time = []
 
     import time
-    run_list = range(3,5)
+    run_list = range(3,8)
     for i in run_list:
         start_time = time.time()
         print "bound dimension: ", i
@@ -100,5 +100,5 @@ if __name__=="__main__":
     pylab.plot(range(len(mrs)), mrs, label = "mps")
     pylab.legend(loc="lower right")
     pylab.show()
-
+    """
 

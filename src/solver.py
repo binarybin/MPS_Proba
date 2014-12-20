@@ -10,7 +10,7 @@ class Solver(object):
     """
     The abstract solver base class
     """
-    boy_models = ["AngryBoys", "RadiatingBoys", "ExponentialBoys"]
+    boy_models = ["AngryBoys", "RadiatingBoys", "ExponentialBoys", "ProjectionBoys"]
     def __init__(self, model):
         self.model = model
     def interpreter(self):

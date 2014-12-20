@@ -8,7 +8,6 @@ Responsible persons:
     Bin Xu for Interpreter
 """
 from solver import Solver
-##from model import AngryBoys
 from copy import deepcopy
 import numpy as np
 import math

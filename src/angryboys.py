@@ -15,18 +15,13 @@ class AngryBoys(Model):
     A probablistic model that describes the model in human language and gives some parameters.
     """
 
-    def __init__(self, size, remain_proba, init_state, output1, output2):
+    def __init__(self, size, remain_proba, init_state):
         self.size = size
         self.remain_proba = remain_proba
         self.init_state = init_state
-        self.output1 = output1
-        self.output2 = output2
         self.model_type = "AngryBoys"
         self.hamiltonian = r"H = pI + (1-p)\sum_{i=1}^{n-1}\frac{1}{n-1}\sigma_i^x\otimes\sigma_{i+1}^x"
-        self.prepareMpo()
-        self.prepareMps()
-        self.prepareTransitionalMat()
-        self.prepareExactInitState()
+
 
     def prepareMpo(self):
         #initialize the MPO

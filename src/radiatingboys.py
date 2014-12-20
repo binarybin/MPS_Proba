@@ -16,7 +16,7 @@ class RadiatingBoys(Model):
     The model is similar to AngryBoys model but with second nearest neighbour interaction.
     """
     
-    def __init__(self, size, remain_proba, nearest_neighbour_proba, second_neighbour_proba, init_state, output1, output2):
+    def __init__(self, size, remain_proba, nearest_neighbour_proba, second_neighbour_proba, init_state):
         self.size = size
         self.p0 = remain_proba
         self.p1 = nearest_neighbour_proba
@@ -24,14 +24,8 @@ class RadiatingBoys(Model):
         if self.p0 + self.p1 + self.p2 != 1:
             raise Exception("The 3 probabilities should add to 1!")
         self.init_state = init_state
-        self.output1 = output1
-        self.output2 = output2
         self.model_type = "RadiatingBoys"
         self.hamiltonian = r"H = p0 I + p1/(n-1) \sum_{i=1}^{n-1}\sigma_i^x\otimes\sigma_{i+1}^x + p2/(n-2) \sum_{i=1}^{n-2} \sigma_i^x\otimes\sigma_{i+2}^x"
-        self.prepareMpo()
-        self.prepareMps()
-        self.prepareTransitionalMat()
-        self.prepareExactInitState()
         
     def prepareMpo(self):
         #initialize the MPO

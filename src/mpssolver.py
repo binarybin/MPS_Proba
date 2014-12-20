@@ -36,13 +36,13 @@ class MpsSolver(Solver):
     ##mpo_element = ndarray(shape = (2, 2, 4, 4), dtype = float) # this is just an example of the mpo, the order of indices: physical_in, physical_out, left_aux, right_aux
 
 
-    def __init__(self, model, bound_dimension, output1, output2):
+    def __init__(self, model, bound_dimension):
         self.model = model
-        self.output1 = output1
-        self.output2 = output2
         self.bound_dimension = bound_dimension
         self.t=0
         self.results = [] # list of mps_chain, result history
+        self.model.prepareMps()
+        self.model.prepareMpo()
         self.interpreter()
 
     def interpreter(self):

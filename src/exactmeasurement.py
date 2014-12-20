@@ -16,11 +16,9 @@ class ExactMeasurement(Measurement):
     """
     The Measurement class for exact solution
     """
-    def __init__(self, solver, output1, output2):
+    def __init__(self, solver):
         self.solver = solver
         self.basis = list(itertools.product(*[(0, 1)] * self.solver.model.size))
-        self.output1 = output1
-        self.output2 = output2
         self.measurement_list = []
         self.measure_result_list = []
         

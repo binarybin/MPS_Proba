@@ -13,10 +13,8 @@ class Measurement(object):
     The abstract Measurement base class
     """
 
-    def __init__(self, solver, output1, output2):
+    def __init__(self, solver):
         self.solver = solver
-        self.output1 = output1
-        self.output2 = output2
         self.measurement_list = []
         self.measure_result_list = []
 

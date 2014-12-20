@@ -16,20 +16,14 @@ class ExponentialBoys(Model):
     The model is similar to AngryBoys model but with exponentially decaying interaction.
     """
     
-    def __init__(self, size, J, K, init_state, output1, output2):
+    def __init__(self, size, J, K, init_state):
         self.size = size
         self.init_state = init_state
-        self.output1 = output1
-        self.output2 = output2
         self.K = K
         self.J = J
         self.model_type = "ExponentialBoys"
         self.hamiltonian = r"H = P (I + J \sum_{i=1}^{n-1} \sum_{j=i+1}^{n-1} K^{j-i}\sigma_i^x\otimes\sigma_j^x)"
         self.normalizeTMat()
-        self.prepareMpo()
-        self.prepareMps()
-        self.prepareTransitionalMat()
-        self.prepareExactInitState()
     
     def normalizeTMat(self):
         totalproba = 1.0 # the not changing channel

@@ -16,14 +16,14 @@ class ExactSolver(Solver):
     """
     The exact solver base class, using transition matrix method
     """
-    def __init__(self,model,output1,output2):
+    def __init__(self,model):
     	self.model = model      
-    	self.output1 = output1
-    	self.output2 = output2
         self.H = 0
         self.t = 0
         self.results = []        
         self.check_norm = []
+        self.model.prepareTransitionalMat()
+        self.model.prepareExactInitState()
         self.interpreter()
     
     def interpreter(self):

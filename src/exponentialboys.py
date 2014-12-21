@@ -17,6 +17,7 @@ class ExponentialBoys(Model):
     """
     
     def __init__(self, size, J, K, init_state):
+        super(ExponentialBoys, self).__init__()
         self.size = size
         self.init_state = init_state
         self.K = K
@@ -44,33 +45,24 @@ class ExponentialBoys(Model):
         # remember our convention: phys_in, phys_out, aux_l, aux_r
         # mpo_left = [p0 I, J K Sx, I]   
                     
-        mpo_left[0, 0, 0, 0] = self.p0
-        mpo_left[1, 1, 0, 0] = self.p0
-        mpo_left[1, 0, 0, 1] = self.J * self.K
-        mpo_left[0, 1, 0, 1] = self.J * self.K
-        mpo_left[1, 1, 0, 2] = 1
-        mpo_left[0, 0, 0, 2] = 1
+        mpo_left[:, :, 0, 0] = self.p0 * self.I
+        mpo_left[:, :, 0, 1] = self.J * self.K * self.sigma_x
+        mpo_left[:, :, 0, 2] = self.I
             
         # mpo_middle = [I,  0,      0]
         #              [Sx, K I,    0]
         #              [0,  J K Sx, I]
-        mpo_middle[0, 0, 0, 0] = 1
-        mpo_middle[1, 1, 0, 0] = 1
-        mpo_middle[1, 0, 1, 0] = 1
-        mpo_middle[0, 1, 1, 0] = 1
-        mpo_middle[0, 0, 1, 1] = self.K
-        mpo_middle[1, 1, 1, 1] = self.K
-        mpo_middle[1, 0, 2, 1] = self.J * self.K
-        mpo_middle[0, 1, 2, 1] = self.J * self.K
-        mpo_middle[1, 1, 2, 2] = 1
-        mpo_middle[0, 0, 2, 2] = 1
+        mpo_middle[:, :, 0, 0] = self.I
+        mpo_middle[:, :, 1, 0] = self.sigma_x
+        mpo_middle[:, :, 1, 1] = self.K * self.I
+        mpo_middle[:, :, 2, 1] = self.J * self.K * self.sigma_x
+        mpo_middle[:, :, 2, 2] = self.I
             
         # mpo_right = [I, Sx, 0].transpose
             
-        mpo_right[0, 0, 0, 0] = 1
-        mpo_right[1, 1, 0, 0] = 1
-        mpo_right[1, 0, 1, 0] = 1
-        mpo_right[0, 1, 1, 0] = 1
+        mpo_right[:, :, 0, 0] = self.I
+        mpo_right[:, :, 1, 0] = self.sigma_x
+
             
         # store the list of mpo's
             
@@ -103,7 +95,7 @@ class ExponentialBoys(Model):
             
     def prepareTransitionalMat(self):
     	#create sigma_x matrix
-    	sigmax = np.matrix('0 1; 1 0')
+    	sigmax = np.matrix(self.sigma_x)
 
     	#non changing channel
     	self.H = self.p0*np.identity(2**self.size) # not changing states

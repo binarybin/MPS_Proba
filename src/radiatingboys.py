@@ -17,6 +17,7 @@ class RadiatingBoys(Model):
     """
     
     def __init__(self, size, remain_proba, nearest_neighbour_proba, second_neighbour_proba, init_state):
+        super(RadiatingBoys, self).__init__()
         self.size = size
         self.p0 = remain_proba
         self.p1 = nearest_neighbour_proba
@@ -41,38 +42,26 @@ class RadiatingBoys(Model):
         self.p1 /= self.size-1
         self.p2 /= self.size-2    
                     
-        mpo_left[0, 0, 0, 0] = self.p0
-        mpo_left[1, 1, 0, 0] = self.p0
-        mpo_left[1, 0, 0, 1] = self.p1
-        mpo_left[0, 1, 0, 1] = self.p1
-        mpo_left[1, 0, 0, 2] = self.p2
-        mpo_left[0, 1, 0, 2] = self.p2
-        mpo_left[1, 1, 0, 3] = 1
-        mpo_left[0, 0, 0, 3] = 1
+        mpo_left[:, :, 0, 0] = self.p0 * self.I
+        mpo_left[:, :, 0, 1] = self.p1 * self.sigma_x
+        mpo_left[:, :, 0, 2] = self.p2 * self.sigma_x
+        mpo_left[:, :, 0, 3] = self.I
             
         # mpo_middle = [I, 0, 0, 0]
         #              [Sx, 0, 0, 0]
         #              [0, I, 0, 0]
         #              [0, p1 Sx, p2 Sx, I]
-        mpo_middle[0, 0, 0, 0] = 1
-        mpo_middle[1, 1, 0, 0] = 1
-        mpo_middle[1, 0, 1, 0] = 1
-        mpo_middle[0, 1, 1, 0] = 1
-        mpo_middle[0, 0, 2, 1] = 1
-        mpo_middle[1, 1, 2, 1] = 1
-        mpo_middle[1, 0, 3, 1] = self.p1
-        mpo_middle[0, 1, 3, 1] = self.p1
-        mpo_middle[1, 0, 3, 2] = self.p2
-        mpo_middle[0, 1, 3, 2] = self.p2
-        mpo_middle[1, 1, 3, 3] = 1
-        mpo_middle[0, 0, 3, 3] = 1
+        mpo_middle[:, :, 0, 0] = self.I
+        mpo_middle[:, :, 1, 0] = self.sigma_x
+        mpo_middle[:, :, 2, 1] = self.I
+        mpo_middle[:, :, 3, 1] = self.p1 * self.sigma_x
+        mpo_middle[:, :, 3, 2] = self.p2 * self.sigma_x
+        mpo_middle[:, :, 3, 3] = self.I
             
         # mpo_right = [I, Sx, 0, 0].transpose
             
-        mpo_right[0, 0, 0, 0] = 1
-        mpo_right[1, 1, 0, 0] = 1
-        mpo_right[1, 0, 1, 0] = 1
-        mpo_right[0, 1, 1, 0] = 1
+        mpo_right[:, :, 0, 0] = self.I
+        mpo_right[:, :, 1, 0] = self.sigma_x
             
         # store the list of mpo's
             
@@ -105,7 +94,7 @@ class RadiatingBoys(Model):
             
     def prepareTransitionalMat(self):
     	#create sigma_x matrix
-    	sigmax = np.matrix('0 1; 1 0')
+    	sigmax = np.matrix(self.sigma_x)
 
     	#non changing channel
     	self.H = self.p0*np.identity(2**self.size) # not changing states

@@ -16,6 +16,7 @@ class AngryBoys(Model):
     """
 
     def __init__(self, size, remain_proba, init_state):
+        super(AngryBoys, self).__init__()
         self.size = size
         self.remain_proba = remain_proba
         self.init_state = init_state
@@ -37,31 +38,22 @@ class AngryBoys(Model):
         # remember our convention: phys_in, phys_out, aux_l, aux_r
         # mpo_left = [pI, qSx, I]
 
-        mpo_left[0, 0, 0, 0] = p
-        mpo_left[1, 1, 0, 0] = p
-        mpo_left[1, 0, 0, 1] = q
-        mpo_left[0, 1, 0, 1] = q
-        mpo_left[1, 1, 0, 2] = 1
-        mpo_left[0, 0, 0, 2] = 1
+        mpo_left[:, :, 0, 0] = p * self.I
+        mpo_left[:, :, 0, 1] = q * self.sigma_x
+        mpo_left[:, :, 0, 2] = self.I
 
         # mpo_middle = [I, 0, 0]
         #              [Sx, 0, 0]
         #              [0, qSx, I]
-        mpo_middle[1, 0, 2, 1] = q
-        mpo_middle[0, 1, 2, 1] = q
-        mpo_middle[1, 1, 2, 2] = 1
-        mpo_middle[0, 0, 2, 2] = 1
-        mpo_middle[0, 0, 0, 0] = 1
-        mpo_middle[1, 1, 0, 0] = 1
-        mpo_middle[1, 0, 1, 0] = 1
-        mpo_middle[0, 1, 1, 0] = 1
+        mpo_middle[:, :, 2, 1] = q * self.sigma_x
+        mpo_middle[:, :, 2, 2] = self.I
+        mpo_middle[:, :, 0, 0] = self.I
+        mpo_middle[:, :, 1, 0] = self.sigma_x
 
         # mpo_right = [I, Sx, 0].transpose
 
-        mpo_right[0, 0, 0, 0] = 1
-        mpo_right[1, 1, 0, 0] = 1
-        mpo_right[1, 0, 1, 0] = 1
-        mpo_right[0, 1, 1, 0] = 1
+        mpo_right[:, :, 0, 0] = self.I
+        mpo_right[:, :, 1, 0] = self.sigma_x
 
         # store the list of mpo's
 
@@ -94,7 +86,7 @@ class AngryBoys(Model):
 
     def prepareTransitionalMat(self):
     	#create sigma_x matrix
-    	sigmax = np.matrix('0 1; 1 0')
+    	sigmax = np.matrix(self.sigma_x)
 
     	#non changing channel
     	self.H = self.remain_proba*np.identity(2**self.size) # not changing states

@@ -21,8 +21,8 @@ class Model(object):
         self.I[1, 1] = 1
         self.sigma_x[0, 1] = 1
         self.sigma_x[1, 0] = 1
-        self.pi_plus[0, 0] = 1
         self.pi_plus[0, 1] = 1
+        self.pi_plus[1, 1] = 1
+        self.pi_minus[0, 0] = 1
         self.pi_minus[1, 0] = 1
-        self.pi_minus[1, 1] = 1
     

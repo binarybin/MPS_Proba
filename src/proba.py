@@ -45,9 +45,9 @@ if __name__=="__main__":
     """
     total_time = 100
 
- #   angry_boys = AngryBoys(size = 200, remain_proba = 0.1, init_state = "all down")
- #   angry_boys = RadiatingBoys(size = 100, remain_proba = 0.1, nearest_neighbour_proba = 0.4, second_neighbour_proba = 0.5, init_state = "all down")
- #   angry_boys = ExponentialBoys(size = 200, J = 0.5, K = 0.5, init_state = "all down")
+#    angry_boys = AngryBoys(size = 10, remain_proba = 0.1, init_state = "all down")
+#    angry_boys = RadiatingBoys(size = 10, remain_proba = 0.1, nearest_neighbour_proba = 0.4, second_neighbour_proba = 0.5, init_state = "all down")
+#    angry_boys = ExponentialBoys(size = 10, J = 0.5, K = 0.5, init_state = "all down")
     angry_boys = ProjectionBoys(size = 10, p0 = 1.0, p1 = 2.0, q1 = 2.0, q2 = 2.0, init_state = "all down")
 
     """
@@ -93,7 +93,7 @@ if __name__=="__main__":
     
     """
     exact_solver = ExactSolver(model = angry_boys)
-    mps_solver = MpsSolver(model = angry_boys, bound_dimension = 20)
+    mps_solver = MpsSolver(model = angry_boys, bound_dimension = 10)
 
     exact_solver.evolve(total_time)
     mps_solver.evolve(total_time)
@@ -103,7 +103,7 @@ if __name__=="__main__":
 
 
     for i in range(total_time):
-        exact_measurement.addMeasureTask(("Proba", i, [(5, "up"), (9,"down")]))
+        exact_measurement.addMeasureTask(("Proba", i, [(5, "up"), (-1,"down")]))
         mps_measurement.addMeasureTask(("Proba", i, [(5, "up"), (-1, "down")]))
 
     exact_measurement.measure()
@@ -112,8 +112,8 @@ if __name__=="__main__":
     ers = exact_measurement.measure_result_list
     mrs = mps_measurement.measure_result_list
 
-    pylab.plot(range(len(ers)), ers, label = "exact")
-    pylab.plot(range(len(mrs)), mrs, label = "mps")
+    pylab.plot(range(len(ers)), ers, "-", label = "exact")
+    pylab.plot(range(len(mrs)), mrs, "o", label = "mps")
     pylab.legend(loc="lower right")
     pylab.show()
     

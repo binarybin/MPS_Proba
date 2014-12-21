@@ -107,8 +107,8 @@ class ProjectionBoys(Model):
     def prepareTransitionalMat(self):
     	#create sigma_x matrix
     	sigmax = np.matrix(self.sigma_x)
-    	pi_plus = np.matrix(self.pi_plus)
-    	pi_minus = np.matrix(self.pi_minus)
+    	pi_plus = np.matrix(self.pi_plus).T
+    	pi_minus = np.matrix(self.pi_minus).T
 
     	#non changing channel
     	self.H = self.p0*np.identity(2**self.size) # not changing states

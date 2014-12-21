@@ -9,14 +9,15 @@ A detailed description of the problems, models and the algorithm is in the docum
 
 Here is a quick start guide.
 ---
-proba.py is the main caller and you can tune the parameters in the main function
-model.py defines some models 
-exactsolver.py and mpssolver.py define two solvers: the former is the traditional transitional matrix method and the latter is the MPS solver. You can compare them for small sizes.
-exactmeasurement.py and mpsmeasurement.py are measurement classes that can compute mean, variance, correlation functions and joint probability.
+* proba.py is the main caller and you can tune the parameters in the main function
+* model.py defines some models 
+* exactsolver.py and mpssolver.py define two solvers: the former is the traditional transitional matrix method and the latter is the MPS solver. You can compare them for small sizes.
+* exactmeasurement.py and mpsmeasurement.py are measurement classes that can compute mean, variance, correlation functions and joint probability.
 
 This project is still in progress and is subject to the GPL 2 licence. Please feel free to contact the authors if you have some questions or suggestions.
 
 Authors:
+---
 Bin Xu (binarybin)
 Peiqi Wang (pqwang1026)
 Liangsheng Zhang (phzls)

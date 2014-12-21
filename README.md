@@ -18,8 +18,8 @@ This project is still in progress and is subject to the GPL 2 licence. Please fe
 
 Authors:
 ---
-Bin Xu (binarybin)
-Peiqi Wang (pqwang1026)
-Liangsheng Zhang (phzls)
-Peter Gjeltema (PJ)
-Jun Xiong (xiongPU)
+* Bin Xu (binarybin)
+* Peiqi Wang (pqwang1026)
+* Liangsheng Zhang (phzls)
+* Peter Gjeltema (PJ)
+* Jun Xiong (xiongPU)

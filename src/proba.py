@@ -43,12 +43,12 @@ if __name__=="__main__":
     """
     The main call of this program.
     """
-    total_time = 100
+    total_time = 40
 
 #    angry_boys = AngryBoys(size = 10, remain_proba = 0.1, init_state = "all down")
-#    angry_boys = RadiatingBoys(size = 10, remain_proba = 0.1, nearest_neighbour_proba = 0.4, second_neighbour_proba = 0.5, init_state = "all down")
+    angry_boys = RadiatingBoys(size = 10, remain_proba = 0.1, nearest_neighbour_proba = 0.4, second_neighbour_proba = 0.5, init_state = "all down")
 #    angry_boys = ExponentialBoys(size = 10, J = 0.5, K = 0.5, init_state = "all down")
-    angry_boys = ProjectionBoys(size = 10, p0 = 1.0, p1 = 2.0, q1 = 2.0, q2 = 2.0, init_state = "all down")
+#    angry_boys = ProjectionBoys(size = 100, p0 = 1.0, p1 = 2.0, q1 = 2.0, q2 = 2.0, init_state = "all down")
 
     """
     mrs = []
@@ -80,7 +80,7 @@ if __name__=="__main__":
 
     """
     """
-    for d in [3, 5, 7, 9, 10, 11]:
+    for d in [12, 13, 14, 15, 16]:
         mps_solver = MpsSolver(model = angry_boys, bound_dimension = d)
         mps_solver.evolve(total_time)
         mps_measurement   = MpsMeasurement(mps_solver)
@@ -114,6 +114,7 @@ if __name__=="__main__":
 
     pylab.plot(range(len(ers)), ers, "-", label = "exact")
     pylab.plot(range(len(mrs)), mrs, "o", label = "mps")
+    
     pylab.legend(loc="lower right")
     pylab.show()
     

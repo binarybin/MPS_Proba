@@ -24,6 +24,8 @@ class RadiatingBoys(Model):
         self.p2 = second_neighbour_proba
         if self.p0 + self.p1 + self.p2 != 1:
             raise Exception("The 3 probabilities should add to 1!")
+        self.p1 /= (self.size-1)
+        self.p2 /= (self.size-2)
         self.init_state = init_state
         self.model_type = "RadiatingBoys"
         self.hamiltonian = r"H = p0 I + p1/(n-1) \sum_{i=1}^{n-1}\sigma_i^x\otimes\sigma_{i+1}^x + p2/(n-2) \sum_{i=1}^{n-2} \sigma_i^x\otimes\sigma_{i+2}^x"
@@ -38,9 +40,6 @@ class RadiatingBoys(Model):
             
         # remember our convention: phys_in, phys_out, aux_l, aux_r
         # mpo_left = [p0 I, p1 Sx, p2 Sx, I]
-        
-        self.p1 /= self.size-1
-        self.p2 /= self.size-2    
                     
         mpo_left[:, :, 0, 0] = self.p0 * self.I
         mpo_left[:, :, 0, 1] = self.p1 * self.sigma_x

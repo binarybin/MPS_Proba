@@ -10,7 +10,6 @@ from measurement import Measurement
 from exactsolver import ExactSolver
 import numpy as np
 import itertools
-from collections import defaultdict
 
 class ExactMeasurement(Measurement):
     """

@@ -45,8 +45,8 @@ if __name__=="__main__":
     """
     total_time = 40
 
-#    angry_boys = AngryBoys(size = 10, remain_proba = 0.1, init_state = "all down")
-    angry_boys = RadiatingBoys(size = 10, remain_proba = 0.1, nearest_neighbour_proba = 0.4, second_neighbour_proba = 0.5, init_state = "all down")
+    angry_boys = AngryBoys(size = 10, remain_proba = 0.1, init_state = "all down")
+#    angry_boys = RadiatingBoys(size = 10, remain_proba = 0.1, nearest_neighbour_proba = 0.4, second_neighbour_proba = 0.5, init_state = "all down")
 #    angry_boys = ExponentialBoys(size = 10, J = 0.5, K = 0.5, init_state = "all down")
 #    angry_boys = ProjectionBoys(size = 100, p0 = 1.0, p1 = 2.0, q1 = 2.0, q2 = 2.0, init_state = "all down")
 
@@ -103,10 +103,10 @@ if __name__=="__main__":
 
 
     for i in range(20):
-    #    exact_measurement.addMeasureTask(("Proba", i, [(5, "up"), (-1,"down")]))
-    #    mps_measurement.addMeasureTask(("Proba", i, [(5, "up"), (-1, "down")]))
-        exact_measurement.addMeasureTask(("Variance", i, [3]))
-        mps_measurement.addMeasureTask(("Variance", i, [3]))
+        exact_measurement.addMeasureTask(("Proba", i, [(5, "up"), (-1,"down")]))
+        mps_measurement.addMeasureTask(("Proba", i, [(5, "up"), (-1, "down")]))
+    #    exact_measurement.addMeasureTask(("Variance", i, [3]))
+    #    mps_measurement.addMeasureTask(("Variance", i, [3]))
 
     exact_measurement.measure()
     mps_measurement.measure()
@@ -118,6 +118,7 @@ if __name__=="__main__":
     pylab.plot(range(len(mrs)), mrs, "o", label = "mps")
     
     pylab.legend(loc="lower right")
+    pylab.title("Joint probability that site 5 is up and the last site is down")
     pylab.show()
     
 

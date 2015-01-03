@@ -42,6 +42,7 @@ class ExactMeasurement(Measurement):
 
         #negative sites case
         temptask = [(self.solver.model.size + one_task[0], one_task[1]) if one_task[0] < 0 else one_task for one_task in temptask]
+        print temptask
         
         #compute probabilities
         proba = 0

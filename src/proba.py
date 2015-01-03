@@ -102,9 +102,11 @@ if __name__=="__main__":
     mps_measurement   = MpsMeasurement(mps_solver)
 
 
-    for i in range(total_time):
-        exact_measurement.addMeasureTask(("Proba", i, [(5, "up"), (-1,"down")]))
-        mps_measurement.addMeasureTask(("Proba", i, [(5, "up"), (-1, "down")]))
+    for i in range(20):
+    #    exact_measurement.addMeasureTask(("Proba", i, [(5, "up"), (-1,"down")]))
+    #    mps_measurement.addMeasureTask(("Proba", i, [(5, "up"), (-1, "down")]))
+        exact_measurement.addMeasureTask(("Variance", i, [3]))
+        mps_measurement.addMeasureTask(("Variance", i, [3]))
 
     exact_measurement.measure()
     mps_measurement.measure()

@@ -148,5 +148,4 @@ class MpsMeasurement(Measurement):
         down *= down
 
         square_ave = self.measureMean(task_new, up, down)
-
         return square_ave - ave*ave

@@ -15,11 +15,9 @@ class ExactMeasurement(Measurement):
     """
     The Measurement class for exact solution
     """
-    def __init__(self, solver, output1, output2):
+    def __init__(self, solver):
         self.solver = solver
         self.basis = list(itertools.product(*[(0, 1)] * self.solver.model.size))
-        self.output1 = output1
-        self.output2 = output2
         self.measurement_list = []
         self.measure_result_list = []
         
@@ -43,22 +41,20 @@ class ExactMeasurement(Measurement):
         time = self.getTimeTask(task, temptask)
 
         #negative sites case
-        for i in range(len(temptask)):
-            if temptask[i][0] < 0:
-                temptask[i] = (self.solver.size + temptask[i][0], temptask[i][1])
+        temptask = [(self.solver.model.size + one_task[0], one_task[1]) if one_task[0] < 0 else one_task for one_task in temptask]
         
         #compute probabilities
         proba = 0
-        for i in range(len(self.basis)):
+        for state_idx, basis in enumerate(self.basis):
             match = True
-            for j in range(len(temptask)):
-                if self.basis[i][temptask[j][0]-1] != self.convert(temptask[j][1]):
+            for one_task in temptask:
+                if basis[one_task[0]-1] != self.convert(one_task[1]):
                     match = False
             if match:
-                proba += self.solver.results[time][i]
-        return proba
+                proba += self.solver.results[time][state_idx]
+        return float(proba)
 
-    def measureCorrelation(self, task,up=None,down=None):
+    def measureCorrelation(self, task, up=None, down=None):
         """
         This implements the measurement of the n-point correlation function
         """
@@ -73,21 +69,19 @@ class ExactMeasurement(Measurement):
         #get time and tasks
         temptask = []
         time = self.getTimeTask(task, temptask)
-
-        for i in range(len(temptask)):
-            if temptask[i] < 0:
-                temptask[i] = self.solver.size + temptask[i]
         
-        corr = 1
-        task_index = 0
-        for i in range(len(self.basis)):
-            match = True
-            for j in range(len(temptask)):
-                if self.basis[i][temptask[j][0]-1] != self.convert(temptask[j][1]):
-                    continue
-                else:
-                    corr *= self.solver.results[time][i]
-        return corr
+        temptask2 = [self.solver.model.size + one_task if one_task < 0 else one_task for one_task in temptask] 
+        temptask = temptask2        
+        corr = 0
+        
+        for state_idx, basis in enumerate(self.basis):
+            temp_corr = self.solver.results[time][state_idx]
+            for one_task in temptask:
+                if basis[one_task-1] == 1: temp_corr *= up # "up"
+                elif basis[one_task-1] == 0: temp_corr *= down # "down"
+                else: raise Exception("basis contains illegal one body states")
+            corr += temp_corr
+        return float(corr)
                 
     def measureMean(self, task, up=None,down=None):
         """
@@ -96,14 +90,7 @@ class ExactMeasurement(Measurement):
         if task[0] != "Mean":
             raise Exception("Task is wrong type")
 
-        if up is None:
-            up = 1
-        if down is None:
-            down = -1
-
-        temptask = []
-        time = self.getTimeTask(task, temptask)
-        newtask = ("", time, temptask)
+        newtask = ("Correlation", task[1], task[2])
         return self.measureCorrelation(newtask, up, down)
         
         
@@ -113,17 +100,11 @@ class ExactMeasurement(Measurement):
         """
         if task[0] != "Variance":
             raise Exception("Task is wrong type")
-    
-        if up is None:
-            up = 1
-        if down is None:
-            down = -1
 
-        temptask = []
-        time = self.getTimeTask(task, temptask)
-        newtask = ("", time, temptask)
-        average = self.measureMean(newtask, up, down)
-        up *= up
-        down *= down
-        square_average = self.measureMean(newtask, up, down)
-        return square_average - average*average
+        mean_task = ("Mean", task[1], task[2])        
+        average = self.measureMean(mean_task, up, down)
+
+        square_average = self.measureMean(mean_task, 1, 1)
+        print square_average
+        return 1 - average*average
+ 

@@ -23,7 +23,7 @@ class Measurement(object):
 
     def measure(self):
         for task in self.measurement_list:
-            self.measure_result_list.append(eval("self.measure"+task[0]+"(task)"))
+            self.measure_result_list.append(eval("self.measure"+task[0]+"(task)")) # this line calls a measure function self.measure*****(task) and append it to the result list
 
 
     # All measure functions take the same input. They have different requested tasks and each measurement function should check the task properties. Raise an exception if

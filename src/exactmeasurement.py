@@ -104,7 +104,7 @@ class ExactMeasurement(Measurement):
         mean_task = ("Mean", task[1], task[2])        
         average = self.measureMean(mean_task, up, down)
 
-        square_average = self.measureMean(mean_task, 1, 1)
+        square_average = self.measureMean(mean_task, 1, 1) # THIS SHOULD GIVE 1, BUT IT DOES NOT!!
         print square_average
         return 1 - average*average
  

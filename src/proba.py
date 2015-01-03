@@ -102,23 +102,22 @@ if __name__=="__main__":
     mps_measurement   = MpsMeasurement(mps_solver)
 
 
-    for i in range(20):
+    for i in range(total_time):
         exact_measurement.addMeasureTask(("Proba", i, [(5, "up"), (-1,"down")]))
         mps_measurement.addMeasureTask(("Proba", i, [(5, "up"), (-1, "down")]))
-    #    exact_measurement.addMeasureTask(("Variance", i, [3]))
-    #    mps_measurement.addMeasureTask(("Variance", i, [3]))
-
     exact_measurement.measure()
     mps_measurement.measure()
 
     ers = exact_measurement.measure_result_list
     mrs = mps_measurement.measure_result_list
 
-    pylab.plot(range(len(ers)), ers, "-", label = "exact")
     pylab.plot(range(len(mrs)), mrs, "o", label = "mps")
+    pylab.plot(range(len(ers)), ers, "-*", label = "exact")
     
     pylab.legend(loc="lower right")
-    pylab.title("Joint probability that site 5 is up and the last site is down")
+    pylab.title("Joint probability: site 5 is up and the last site is down.\n Chain length: 10; bound dimension: 10")
+    pylab.xlabel("time")
+    pylab.ylabel("Probability")
     pylab.show()
     
 

@@ -20,7 +20,7 @@ class ExactMeasurement(Measurement):
         self.basis = list(itertools.product(*[(0, 1)] * self.solver.model.size))
         self.measurement_list = []
         self.measure_result_list = []
-        
+
     def convert(self, state):
         if state == "up":
             return 1
@@ -28,7 +28,7 @@ class ExactMeasurement(Measurement):
             return 0
         else:
             raise Exception("Converting state failure")
-    
+
     def measureProba(self, task):
         """
         This implements the measurement of the probability (possibly joint probability) for an event or several events to be realized
@@ -42,8 +42,8 @@ class ExactMeasurement(Measurement):
 
         #negative sites case
         temptask = [(self.solver.model.size + one_task[0], one_task[1]) if one_task[0] < 0 else one_task for one_task in temptask]
-        print temptask
-        
+        #print temptask
+
         #compute probabilities
         proba = 0
         for state_idx, basis in enumerate(self.basis):
@@ -70,20 +70,21 @@ class ExactMeasurement(Measurement):
         #get time and tasks
         temptask = []
         time = self.getTimeTask(task, temptask)
-        
-        temptask2 = [self.solver.model.size + one_task if one_task < 0 else one_task for one_task in temptask] 
-        temptask = temptask2        
+
+        temptask2 = [self.solver.model.size + one_task if one_task < 0 else one_task for one_task in temptask]
+        temptask = temptask2
         corr = 0
-        
+
         for state_idx, basis in enumerate(self.basis):
-            temp_corr = self.solver.results[time][state_idx]
+            temp_corr = float(self.solver.results[time][state_idx])
             for one_task in temptask:
                 if basis[one_task-1] == 1: temp_corr *= up # "up"
                 elif basis[one_task-1] == 0: temp_corr *= down # "down"
                 else: raise Exception("basis contains illegal one body states")
             corr += temp_corr
-        return float(corr)
-                
+
+        return corr
+
     def measureMean(self, task, up=None,down=None):
         """
         Mean is a special case of correlation, with only one variable. Just find the correct type and call measureCorrelation
@@ -93,8 +94,8 @@ class ExactMeasurement(Measurement):
 
         newtask = ("Correlation", task[1], task[2])
         return self.measureCorrelation(newtask, up, down)
-        
-        
+
+
     def measureVariance(self, task, up=None, down=None):
         """
         Mean is a special case of correlation, with only one variable. Just find the correct type and call measureCorrelation
@@ -102,10 +103,10 @@ class ExactMeasurement(Measurement):
         if task[0] != "Variance":
             raise Exception("Task is wrong type")
 
-        mean_task = ("Mean", task[1], task[2])        
+        mean_task = ("Mean", task[1], task[2])
         average = self.measureMean(mean_task, up, down)
 
         square_average = self.measureMean(mean_task, 1, 1) # THIS SHOULD GIVE 1, BUT IT DOES NOT!!
         print square_average
-        return 1 - average*average
- 
+        return square_average - average*average
+

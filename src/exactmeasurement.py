@@ -122,6 +122,5 @@ class ExactMeasurement(Measurement):
 
         square_average = self.measureMean(mean_task, up*up, down*down)
 
-        print square_average
         return square_average - average*average
 

@@ -29,6 +29,7 @@ Code style conventions:
 """
 
 import sys
+from copy import deepcopy
 from angryboys import AngryBoys
 from radiatingboys import RadiatingBoys
 from exponentialboys import ExponentialBoys
@@ -108,16 +109,51 @@ if __name__=="__main__":
     exact_measurement.measure()
     mps_measurement.measure()
 
-    ers = exact_measurement.measure_result_list
-    mrs = mps_measurement.measure_result_list
+    epb = deepcopy(exact_measurement.measure_result_list)
+    mpb = deepcopy(mps_measurement.measure_result_list)
+    exact_measurement.measure_result_list = []
+    mps_measurement.measure_result_list = []
+    exact_measurement.measurement_list = []
+    mps_measurement.measurement_list = []
 
-    pylab.plot(range(len(mrs)), mrs, "o", label = "mps")
-    pylab.plot(range(len(ers)), ers, "-*", label = "exact")
+    for i in range(total_time):
+        exact_measurement.addMeasureTask(("Mean", i, [5]))
+        mps_measurement.addMeasureTask(("Mean", i, [5]))
+    exact_measurement.measure()
+    mps_measurement.measure()
+
+    emn = deepcopy(exact_measurement.measure_result_list)
+    mmn = deepcopy(mps_measurement.measure_result_list)
+    exact_measurement.measure_result_list = []
+    mps_measurement.measure_result_list = []
+    exact_measurement.measurement_list = []
+    mps_measurement.measurement_list = []
+
+    for i in range(total_time):
+        exact_measurement.addMeasureTask(("Variance", i, [5]))
+        mps_measurement.addMeasureTask(("Variance", i, [5]))
+    exact_measurement.measure()
+    mps_measurement.measure()
+
+    eva = deepcopy(exact_measurement.measure_result_list)
+    mva = deepcopy(mps_measurement.measure_result_list)
+    exact_measurement.measure_result_list = []
+    mps_measurement.measure_result_list = []
+    exact_measurement.measurement_list = []
+    mps_measurement.measurement_list = []
+    
+    pylab.plot(range(len(mpb)), mpb, "o", label = "mps, joint probability")
+    pylab.plot(range(len(epb)), epb, "-*", label = "exact, joint probability")
+    
+    pylab.plot(range(len(mmn)), mmn, "o", label = "mps, mean")
+    pylab.plot(range(len(emn)), emn, "-*", label = "exact, mean")
+    
+    pylab.plot(range(len(mva)), mva, "o", label = "mps, variance")
+    pylab.plot(range(len(eva)), eva, "-*", label = "exact, variance")
     
     pylab.legend(loc="lower right")
-    pylab.title("Joint probability: site 5 is up and the last site is down.\n Chain length: 10; bound dimension: 10")
     pylab.xlabel("time")
-    pylab.ylabel("Probability")
+    pylab.ylabel("Measurements")
     pylab.show()
     
 

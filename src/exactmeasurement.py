@@ -49,7 +49,7 @@ class ExactMeasurement(Measurement):
         for state_idx, basis in enumerate(self.basis):
             match = True
             for one_task in temptask:
-                if basis[one_task[0]-1] != self.convert(one_task[1]):
+                if basis[one_task[0]] != self.convert(one_task[1]):
                     match = False
             if match:
                 proba += self.solver.results[time][state_idx]
@@ -78,8 +78,8 @@ class ExactMeasurement(Measurement):
         for state_idx, basis in enumerate(self.basis):
             temp_corr = float(self.solver.results[time][state_idx])
             for one_task in temptask:
-                if basis[one_task-1] == 1: temp_corr *= up # "up"
-                elif basis[one_task-1] == 0: temp_corr *= down # "down"
+                if basis[one_task] == 1: temp_corr *= up # "up"
+                elif basis[one_task] == 0: temp_corr *= down # "down"
                 else: raise Exception("basis contains illegal one body states")
             corr += temp_corr
 
@@ -92,7 +92,11 @@ class ExactMeasurement(Measurement):
         if task[0] != "Mean":
             raise Exception("Task is wrong type")
 
-        newtask = ("Correlation", task[1], task[2])
+        #get time and tasks
+        temptask = []
+        time = self.getTimeTask(task, temptask)
+
+        newtask = ("Correlation", time, temptask)
         return self.measureCorrelation(newtask, up, down)
 
 
@@ -103,10 +107,21 @@ class ExactMeasurement(Measurement):
         if task[0] != "Variance":
             raise Exception("Task is wrong type")
 
-        mean_task = ("Mean", task[1], task[2])
+        #get time and tasks
+        temptask = []
+        time = self.getTimeTask(task, temptask)
+
+        mean_task = ("Mean", time, temptask)
+
+        if up is None:
+            up = 1
+        if down is None:
+            down = -1
+
         average = self.measureMean(mean_task, up, down)
 
-        square_average = self.measureMean(mean_task, 1, 1) # THIS SHOULD GIVE 1, BUT IT DOES NOT!!
+        square_average = self.measureMean(mean_task, up*up, down*down)
+
         print square_average
         return square_average - average*average
 

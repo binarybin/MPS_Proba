@@ -44,7 +44,7 @@ if __name__=="__main__":
     """
     The main call of this program.
     """
-    total_time = 200
+    total_time = 100
 
     angry_boys = AngryBoys(size = 200, remain_proba = 0.1, init_state = "all down")
 #    angry_boys = RadiatingBoys(size = 200, remain_proba = 0.1, nearest_neighbour_proba = 0.4, second_neighbour_proba = 0.5, init_state = "all down")

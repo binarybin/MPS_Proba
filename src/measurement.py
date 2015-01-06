@@ -17,7 +17,11 @@ class Measurement(object):
         self.solver = solver
         self.measurement_list = []
         self.measure_result_list = []
-
+    
+    def clearMeasurement(self):
+        self.measurement_list = []
+        self.measure_result_list = []
+    
     def addMeasureTask(self, task):
         self.measurement_list.append(task)
 

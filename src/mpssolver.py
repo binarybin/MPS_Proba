@@ -207,14 +207,23 @@ class MpsSolver(Solver):
             B=np.dot(np.diag(s),V)
             self.mpsc[self.L-2-i]=np.tensordot(self.mpsc[self.L-2-i],B,axes=([2],[1]))
 
-    #Initialize the two lists of partial overlap
-    def initializePartialOvl(self):
-        self.partial_overlap_rl[self.L-1]=np.tensordot(self.mpsc[self.L-1],self.mps[self.L-1],axes=([0],[0]));
-        self.partial_overlap_rl[self.L-1]=self.partial_overlap_rl[self.L-1][:,0,:,0];
-
-        for i in range(self.L-1):
-            A=np.tensordot(self.mpsc[self.L-2-i],self.mps[self.L-2-i],axes=([0],[0]))
-            self.partial_overlap_rl[self.L-2-i]=np.tensordot(A,self.partial_overlap_rl[self.L-1-i],axes=([1,3],[0,1]))
+    #Initialize the list of partial overlap, depending on the direction of first compression sweep.
+    def initializePartialOvl(self,direction):
+        #If the first sweep is from left to right, we initialize the right to left partial overlap list.
+        if (direction==0):
+            self.partial_overlap_rl[self.L-1]=np.tensordot(self.mpsc[self.L-1],self.mps[self.L-1],axes=([0],[0]));
+            self.partial_overlap_rl[self.L-1]=self.partial_overlap_rl[self.L-1][:,0,:,0];
+            for i in range(self.L-1):
+                A=np.tensordot(self.mpsc[self.L-2-i],self.mps[self.L-2-i],axes=([0],[0]))
+                self.partial_overlap_rl[self.L-2-i]=np.tensordot(A,self.partial_overlap_rl[self.L-1-i],axes=([1,3],[0,1]))
+        #If the first sweep is from right to left, we initialize the left to right partial overlap list.
+        elif (direction==1):
+            self.partial_overlap_lr[0]=np.tensordot(self.mpsc[0],self.mps[0],axes=([0],[0]));
+            self.partial_overlap_lr[0]=self.partial_overlap_lr[0][0,:,0,:];
+            for i in range(self.L-1):
+                A=np.tensordot(self.mpsc[i+1],self.mps[i+1],axes=([0],[0]))
+                self.partial_overlap_lr[i+1]=np.tensordot(A,self.partial_overlap_lr[i],axes=([0,2],[0,1]))
+           
 
     #Perform a single sweep from left to right
     def compressionSweepLeftRight(self):
@@ -292,8 +301,9 @@ class MpsSolver(Solver):
         mpsc_module=np.tensordot(mpsc_module,B,axes=([0,1],[1,3]))
         self.cpr_err=mpsc_module-2*self.partial_overlap_rl[0]
 
-    #wrap everything up
-    def compressionVariational(self):
+    #main routine for compression by variation. Options:
+    #direction: choose the direction for first sweep, 0 for left to right and 1 for right to left.
+    def compressionVariational(self,direction=0):
         """
         The compression based on the variational principle, to be implemented by Peiqi Wang
         """
@@ -301,27 +311,27 @@ class MpsSolver(Solver):
         #self.compressionSVDSweepToLeft()
         self.initializeMpscVar()
         ##Initialize Partial Overlap lists
-        self.initializePartialOvl()
+        self.initializePartialOvl(direction)
         ##Calculate the L2 norm of the MPS to be compressed
         mps_norm=0 #self.overlap(self.mps,self.mps)
         error=10000
         ##Direction of previous sweep. 0 means left to right and 1 means right to left
-        last_direction=1
-        for sweep in range(1):
+        last_direction=1-direction
+        while (error>self.epsil):
             if (last_direction==1):
                 last_cpr_err=self.cpr_err
                 self.compressionSweepLeftRight()
                 self.cpr_err=self.cpr_err+mps_norm
                 print(math.sqrt(abs(self.cpr_err)*self.L)) # approximately the L1 norm
                 error=abs(last_cpr_err-self.cpr_err)
-#                last_direction = 0
+                last_direction = 0
             elif (last_direction==0):
                 last_cpr_err=self.cpr_err
                 self.compressionSweepRightLeft()
                 self.cpr_err=self.cpr_err+mps_norm
                 print(math.sqrt(abs(self.cpr_err)*self.L)) # approximately the L1 norm
                 error=abs(last_cpr_err-self.cpr_err)
-#                last_direction = 1
+                last_direction = 1
 
     def normalizeProba(self):
         result=np.sum(self.mpsc[0],axis=0)

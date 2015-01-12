@@ -6,6 +6,8 @@
 \usepackage[latin9]{inputenc}
 \usepackage{amstext}
 \usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
 \usepackage{babel}
 \usepackage{courier}
 \usepackage[margin=1in]{geometry}
@@ -279,6 +281,59 @@ The \texttt{Measurement} class includes functions for calculating the expectatio
 \item Implement the algorithm in C++ to gain a speed-up.
 \item If time permits, we can try some basic ideas of a time evolving PEPS algorithm to study 2-dimensional problems.
 \end{itemize}
+
+
+\section{Implementation details}
+\subsection{Compression by variation}
+\subsubsection{Some maths}
+Denote $|\psi\rangle=\sum_{\sigma}M^{\sigma_1}\dots M^{\sigma_L}$ the MPS to be compressed. The method of compression by variation consists of finding a new MPS $|\bar\psi\rangle=\sum_{\sigma}\bar M^{\sigma_1}\dots 
+ \bar M^{\sigma_L}$ where each $\bar M^{\sigma_i}$ is of desired size, such that the $L^2-$ distance between $|\bar\psi\rangle$ and $|\psi\rangle$ is minimized. Formally:
+ \[
+|\bar\psi\rangle = \arg\min_{|\phi\rangle=\sum_{\sigma}\bar M^{\sigma_1}\dots 
+ \bar M^{\sigma_L}, M^{\sigma_L} \in \mathbb{R}^{d\times d} }\||\phi \rangle-|\psi\rangle\|^2
+ \]
+ This is a rather complicated optimization problem. One heuristic to tackle it is to proceed the optimization iteratively. We start with an initial guess of the minimizer. We keep all other matrices fixed and minimize $\||\phi \rangle-|\bar\phi\rangle\|^2$ with respect to the matrix of the first physical site $\bar M^{\sigma_1}$. Upon obtaining the minimizer we update $|\bar\phi\rangle$, move to the next site and repeat this procedure. We do this until we reach the last physical site. This is called a sweep. We then repeat the sweep through the chain and check the $L^2-$ distance between original and compressed MPS after each sweep. We stop the process when $L^2-$ distance stops to decrease with respect to a given level of tolerance.
+
+The key in this algorithm is to minimize $\||\phi \rangle-|\bar\phi\rangle\|^2$ with respect to the matrix of a given physical site. This can be done by exploiting the first-order condition. Let us denote $M^*$ the conjugate transpose of matrix $M$. Then at the optimum, for each $\sigma_i$ (physical states), $a_i$ and $a_{i-1}$ (auxiliary states) we must have
+\[
+0=\frac{\partial}{\partial M^{\sigma_i,*}_{a_i,a_{i-1}}} \||\phi \rangle-|\bar\phi\rangle\|^2 = \frac{\partial}{\partial M^{\sigma_i,*}_{a_i,a_{i-1}}} \left(-\langle\bar\psi | \psi\rangle +  \langle\bar\psi |\bar \psi\rangle \right)
+\]
+The last equality is due to the fact that $M^{\sigma_i,*}_{a_i,a_{i-1}}$ only shows up in $\langle\bar\psi|$. Further expansion of the equation provides that
+\[
+\begin{array}{rl}
+0=&\displaystyle\frac{\partial}{\partial M^{\sigma_i,*}_{a_i,a_{i-1}}} \left(-\langle\bar\psi | \psi\rangle +  \langle\bar\psi |\bar \psi\rangle \right)\\\\
+=&\displaystyle \sum_{\sigma\setminus\sigma_i}(\bar M^{\sigma_1,*}\dots\bar M^{\sigma_{i-1},*})_{1,a_{i-1}}(\bar M^{\sigma_{i+1},*}\dots\bar M^{\sigma_{L},*})_{a_{i},1}\bar M^{\sigma_1}\dots \bar M^{\sigma_i}\dots\bar M^{\sigma_L}\\\\
+&-\displaystyle \sum_{\sigma\setminus\sigma_i}(\bar M^{\sigma_1,*}\dots\bar M^{\sigma_{i-1},*})_{1,a_{i-1}}(\bar M^{\sigma_{i+1},*}\dots\bar M^{\sigma_{L},*})_{a_{i},1} M^{\sigma_1}\dots  M^{\sigma_i}\dots M^{\sigma_L}
+\end{array}
+\]
+Here $\sigma\setminus\sigma_i$ means the sum takes over all the physical sites except the $i-$th physical site. The above can be further simplified if we assume that $\bar M$ is under mixed-canonical form, i.e. $\sum_{\sigma_i}M^{\sigma_j,*}M^{\sigma_i}=Id, \forall j=1\dots i-1$ and $\sum_{\sigma_i}M^{\sigma_j}M^{\sigma_i,*}=Id, \forall j=i+1\dots L$. Under this assumption, the first term on the right hand side simplifies to $\bar M^{\sigma_i}_{a_{i-1},a_1}$, which is exactly the coefficient we are looking for. Then the equation can be written as
+\[
+\bar M^{\sigma_i}_{a_{i-1},a_1}=\sum_{a'_{i-1}a'_i}L_{a_{i-1},a'_{i-1}}M^{\sigma_i}_{a'_{i-1},a'_i}R_{a_i,a'_i}
+\]
+where $L$ is the overlap of $M$ and $\bar M$ from left to the $(i-1)$th state, and $R$ is the overlap of $M$ and $\bar M$ from right to the $(i+1)$th state. We call objects like $L$ and $R$ respectively the left partial overlap and the right partial overlap. Obviously from what has been described about the algorithm, the partial overlaps need to be used and updated during the sweeps. When implementing the algorithm, we store them in the lists \texttt{self.partial\textunderscore overlap\textunderscore lr} and \texttt{self.partial\textunderscore overlap\textunderscore rl}. Note that the last element of \texttt{self.partial\textunderscore overlap\textunderscore lr} and the first element of \texttt{self.partial\textunderscore overlap\textunderscore lr} are actually the full overlap of compressed state and the original state. This is useful in computing the $L^2-$distance and in deciding when to stop the sweep.
+
+Another thing to pay attention is the normalization. Indeed all the MPS studied here represent a probability distribution. Thus summing over all the physical status we must obtain 1. However after the procedure of compression this can no longer be guaranteed. Therefore the result of compression must be normalized by its $L^1-$norm.
+
+\subsubsection{Implementation}
+The main routine for compression by variation is \texttt{self.compressionVariational}. It does the following operations:
+\begin{itemize}
+\item \texttt{self.initializeMpscVar}: Form a initial guess of the compressed MPS of desired size. It is then left or right canonized, depending on the direction of the first sweep. $L^2-$distance with the original MPS is calculated. 
+\item \texttt{self.initializePartialOvl}: Initialize the partial overlap lists. Note that if the first sweep is from left to right, then we only have to initialize the right partial overlaps.
+\item \texttt{self.compressionSweepLeftRight}: Perform a sweep from left to right. For each site, we calculate the matrix using left and right partial overlap. Before moving to the next site on the right, we have to left-normalize the current site(to preserve the mixed-canonical form) and update the left partial overlap list. At the end of the sweep, we calculate the $L^2-$distance with the original MPS and store the value in \texttt{self.cpr\textunderscore err}.
+\item \texttt{self.compressionSweepRightLeft}: Perform a sweep from right to left. The idea is the same as described above.
+\item We start the sweep with direction specified by the user and alternate the left and right sweeps until the $L^2-$distance recorded by \texttt{self.cpr\textunderscore err} converges.
+\end{itemize}
+Throughout the sweeps, we also keep tracks of the $L^1-$norm of the MPS. User can choose whether to normalize the MPS after each sweep, or after all sweeps have been done.
+
+\subsubsection{Usage}
+\texttt{self.compressionVariational(direction,sweep\textunderscore nbr,norm)} compresses the MPS stored in \texttt{self.mps} and write the results in \texttt{self.mpsc}. User can set the dimension of compressed MPS via the variable \texttt{self.bound\textunderscore dimension}. The tolerance of convergence for sweeps can be accessed by \texttt{self.epsil}.  Options available for \texttt{self.compressionVariational} include:
+\begin{itemize}
+\item \texttt{direction}: the direction of first sweep. $0$ for left to right and $1$ for right to left. The default is to sweep from left to right first.
+\item \texttt{sweep\textunderscore nbr}: The total number of sweeps the user desires to make. If  \texttt{sweep\textunderscore nbr}$ =0$, then sweeps will continue until converge.
+\item \texttt{norm}: whether to normalize after each sweep or after all the sweeps. If \texttt{norm} $=0$, the compressed MPS will be normalized after all the sweeps. If \texttt{norm} $=1$, the compressed MPS will be normalized after each sweep.
+\end{itemize}
+Example: \texttt{self.compressionVariational(, 4, 1)} will perform 4 compression sweeps, with the first one from right to left. The compressed MPS will be normalized after each sweep.
+
 
 \begin{thebibliography}{99}
 \bibitem{white} S. R. White, {\it Physical Review Letters} {\bf 69}, 2863 (1992)

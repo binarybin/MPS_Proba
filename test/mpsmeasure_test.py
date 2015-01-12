@@ -1,3 +1,6 @@
+import sys
+sys.path.append('../src/')
+
 from mpsmeasurement import MpsMeasurement
 import unittest
 import numpy as np
@@ -10,8 +13,6 @@ class TestSolver(object):
 class MpsMeasurementTest(unittest.TestCase):
     def testOnestie(self):
         solver = TestSolver(1)
-        output1 = []
-        output2 = []
 
         w = np.ndarray(shape = (2, 1, 1), dtype = float)
 
@@ -22,7 +23,7 @@ class MpsMeasurementTest(unittest.TestCase):
             solver.results = [[]]
             solver.results[0].append(w)
 
-            measure = MpsMeasurement(solver, output1, output2)
+            measure = MpsMeasurement(solver)
 
             task_up = ("Proba", (0, "up"))
             prob_up = 1-p
@@ -52,8 +53,6 @@ class MpsMeasurementTest(unittest.TestCase):
 
     def testTwosties(self):
         solver = TestSolver(2)
-        output1 = []
-        output2 = []
 
         w1 = np.ndarray(shape = (2, 1, 2), dtype = float)
         w2 = np.ndarray(shape = (2, 2, 1), dtype = float)
@@ -68,7 +67,7 @@ class MpsMeasurementTest(unittest.TestCase):
 
                 solver.results = [[w1,w2]]
 
-                measure = MpsMeasurement(solver, output1, output2)
+                measure = MpsMeasurement(solver)
 
                 task_up_up = ("Proba", (0, "up"), (1, "up"))
                 prob_up_up = (1-p1) * (1-p2)
@@ -98,8 +97,6 @@ class MpsMeasurementTest(unittest.TestCase):
 
     def testThreesites(self):
         solver = TestSolver(3)
-        output1 = []
-        output2 = []
 
         w1 = np.ndarray(shape = (2, 1, 2), dtype = float)
         w2 = np.ndarray(shape = (2, 2, 4), dtype = float)
@@ -121,7 +118,7 @@ class MpsMeasurementTest(unittest.TestCase):
 
                 solver.results = [[w1, w2, w3]]
 
-                measure = MpsMeasurement(solver, output1, output2)
+                measure = MpsMeasurement(solver)
 
                 task_up = ("Proba", (0, "up"))
                 prob_up = p + q

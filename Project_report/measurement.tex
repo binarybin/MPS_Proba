@@ -1,2 +1,26 @@
 
-The \texttt{Measurement} class includes functions for calculating the expectation of a given operator, the conditional probability of certain states, and possibly the correlation functions of different time steps. Both the conditional probability and correlation function may require us to store the MPS at each step. By calling this storage, we don't need to rerun the MPS procedure to calculate new physical quantities. And this is one of the advantages of MPS over Monte Carlo method. In the simplest form, the user can specify a set of states/operators through a defined structure, which are then combined with final state of the system to give (conditional) probabilities. If time permitted, we will try to extend the measurement to include time-dependent information.
+The \texttt{Measurement} class includes functions for calculating joint probability, correlations among multiple sites and mean as well as variance for a particular site at any time point. For the last two calculations, user can define specific values for being angry (up) or calm (down), and by default, they are 1 and -1 respectively. Both time and site number counts from 0, and a python-way of specifying the number from the end of list is also accepted. Each measurement task must specified in the particular way, though measurement time can be omitted, in which case it is taken to be the most recent time computed. Note in each task tuple, the integer following the task name will always be taken as the time step for all measurement. For more details, please consult the user manual or the sample program.
+
+
+
+\subsubsection{Exact Measurement}
+
+The measurement in exact calculations is straightforward. Since each site has only 2 distinct states, any definite state of the system can be encoded as a binary number, i.e., in  the program, the down state is encoded as 0 and up state is encoded as 1, and the random state of the system at any time is fully specified by giving the probability of all definite states. From these full joint (in terms of each site) distributions, all quantities at a particular time point can be computed from marginalization. Moreover, the average value of given site is a special case of general correlation function, which is an average of a sequence of sites, and from the average value the variance of a given site can be easily computed by using appropriate up and down values.
+
+
+
+\subsubsection{MPS Measurement}
+
+The measurement in the MPS case is a little bit more complicated since we are not directly specifying full joint probability distributions as in the exact calculation. However, from the definition of MPS, we can see that for a particular definite state of the system which is encoded as $s_0s_1\cdots s_{L-1}$, where $s_i=0$ or $1$ for any $i$ and $L$ is the length of the chain, its probability can be computed from a matrix product 
+\begin{displaymath}
+P(s_1s_2\dots s_{L-1}) = M_0^{s_0}M_1^{s_1}\cdots M_{L-1}^{s_{L-1}}
+\end{displaymath} 
+where $M_i^{s_i}$ is the matrix representation of site $i$ being in the state $s_i$. Since the matrices at first and last site are row and column vectors respectively, in the end we will obtain a number as expected. From these full joint probability distributions, we then can obtain all measurement quantities at a particular time as in the exact calculation. There is also a little trick to speed up the marginalization by using the distributive law in matrix multiplication. For example, if we want to compute the joint distribution of sites $i_1$, $i_2,\cdots,i_n$ in states $s_1$, $s_2,\cdots,s_n$, where, for simplicity, assuming $0<i_1<i_2<\cdots<i_n<L-1$, we then have the desired probability to be
+\begin{displaymath}
+P(s_{i_1}s_{i_2}\dots s_{i_n}) = (M_0^{0} + M_0^{1})\cdots M_{i_1}^{s_{i_1}}\cdots M_{i_2}^{s_{i_2}} \cdots M_{i_n}^{s_{i_n}} \cdots (M_{L-1}^{0} + M_{L-1}^{1})
+\end{displaymath}
+i.e, we add up the matrices representing up and down for all sites except sites $i_1$, $i_2,\cdots,i_n$, for which a particular matrix is chosen, and then multiply all matrices. Similarly, for a correlation as $\langle S_{i_1} S_{i_2} \cdots S_{i_n} \rangle$, where $S_i$ is the random variable representing the two possible states at site $i$, we can obtain it from
+\begin{displaymath}
+\langle S_{i_1} S_{i_2} \cdots S_{i_n} \rangle = (\sigma_0^0 M_0^0 + \sigma_0^1M_0^1)(\sigma_1^0M_1^0 + \sigma_1^1M_1^1)\cdots (\sigma_{L-1}^0M_{L-1}^0 + \sigma_{L-1}^1M^1_{L-1})
+\end{displaymath}
+where $\sigma_i^0=\sigma_i^1=1$ for all sites except $i_1$, $i_2,\cdots,i_n$, where $\sigma_i^0=$ specified value for down state and $\sigma_i^1=$ specified value for up state. 

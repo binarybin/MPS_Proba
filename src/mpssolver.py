@@ -58,7 +58,8 @@ class MpsSolver(Solver):
             self.partial_overlap_lr=[None]*self.L;
             self.partial_overlap_rl=[None]*self.L;
             self.cpr_err=0
-            self.epsil=0.00001
+            self.epsil=0.0000000001
+            self.negative_norm_flag=0
         else:
             raise Exception("The model is not supported!")
 
@@ -74,7 +75,10 @@ class MpsSolver(Solver):
 
     def evolve(self,nstep):
         for i in range(nstep):
-            self.step()
+            if (self.negative_norm_flag==0):
+                self.step()
+            else:
+                break
 
     #Update the system state from t to t+1
     def step(self):
@@ -288,10 +292,16 @@ class MpsSolver(Solver):
         self.l1_norm=float(self.l1_norm)
         #normalize the states if required by the user
         if (norm==1):
-            Ka=self.l1_norm**(1.0/self.L)
-            self.mpsc=[(self.mpsc[n])/Ka for n in range(self.L)]
-            self.cpr_err=mpsc_module/(self.l1_norm*self.l1_norm)-2*self.partial_overlap_lr[self.L-1]/self.l1_norm
-            self.partial_overlap_lr=[(self.partial_overlap_lr[n])/(Ka**(n+1)) for n in range(self.L)]
+            try:
+                Ka=self.l1_norm**(1.0/self.L)
+                self.mpsc=[(self.mpsc[n])/Ka for n in range(self.L)]
+                self.cpr_err=mpsc_module/(self.l1_norm*self.l1_norm)-2*self.partial_overlap_lr[self.L-1]/self.l1_norm
+                self.partial_overlap_lr=[(self.partial_overlap_lr[n])/(Ka**(n+1)) for n in range(self.L)]
+                self.negative_norm_flag=0
+            except ValueError:
+                print "Warning: Negative norm ("+str(self.l1_norm)+") obtained at t="+str(self.t+1)+", maybe stuck in a local minimum."
+                print "Try to increase epsilon or decrease the number of sweeps and call compressionVariational() again."
+                self.negative_norm_flag=1
         
     #Perform a single sweep from right to left
     #Normalize the mpsc after each sweep if input norm=1
@@ -340,10 +350,16 @@ class MpsSolver(Solver):
         self.l1_norm=float(self.l1_norm)
         #normalize the states if required by the user
         if (norm==1):
-            Ka=self.l1_norm**(1.0/self.L)
-            self.mpsc=[(self.mpsc[n])/Ka for n in range(self.L)]
-            self.cpr_err=mpsc_module/(self.l1_norm**2)-2*self.partial_overlap_rl[0]/self.l1_norm
-            self.partial_overlap_rl=[(self.partial_overlap_rl[n])/(Ka**(self.L-n)) for n in range(self.L)]
+            try:
+                Ka=self.l1_norm**(1.0/self.L)
+                self.mpsc=[(self.mpsc[n])/Ka for n in range(self.L)]
+                self.cpr_err=mpsc_module/(self.l1_norm**2)-2*self.partial_overlap_rl[0]/self.l1_norm
+                self.partial_overlap_rl=[(self.partial_overlap_rl[n])/(Ka**(self.L-n)) for n in range(self.L)]
+                self.negative_norm_flag=0
+            except ValueError:
+                print "Warning: Negative norm ("+str(self.l1_norm)+") obtained at t="+str(self.t+1)+", maybe stuck in a local minimum."
+                print "Try to increase epsilon or decrease the number of sweeps and call compressionVariational() again."
+                self.negative_norm_flag=1
 
     #main routine for compression by variation. Options:
     #direction: choose the direction for first sweep, 0 for left to right and 1 for right to left.
@@ -371,19 +387,19 @@ class MpsSolver(Solver):
                 if (last_direction==1):
                     last_cpr_err=self.cpr_err
                     self.compressionSweepLeftRight(norm)
-                    print(self.l1_norm) # show the L1 norm of mpsc
+                    # print(self.l1_norm) # show the L1 norm of mpsc
                     error=abs(last_cpr_err-self.cpr_err)
                     last_direction = 0
                     sweep=sweep+1
                 elif (last_direction==0):
                     last_cpr_err=self.cpr_err
                     self.compressionSweepRightLeft(norm)
-                    print(self.l1_norm) # show the L1 norm of mpsc
+                    # print(self.l1_norm) # show the L1 norm of mpsc
                     error=abs(last_cpr_err-self.cpr_err)
                     last_direction = 1
                     sweep=sweep+1
             #number of sweeps performs
-            print(sweep)
+            # print(sweep)
             if (norm==0):
                 self.normalizeProba()
                 
@@ -393,18 +409,24 @@ class MpsSolver(Solver):
                 if (last_direction==1):
                     last_cpr_err=self.cpr_err
                     self.compressionSweepLeftRight(norm)
-                    print(self.l1_norm) # show the L1 norm of mpsc
+                    # print(self.l1_norm) # show the L1 norm of mpsc
                     error=abs(last_cpr_err-self.cpr_err)
                     last_direction = 0
                 elif (last_direction==0):
                     last_cpr_err=self.cpr_err
                     self.compressionSweepRightLeft(norm)
-                    print(self.l1_norm) # show the L1 norm of mpsc
+                    # print(self.l1_norm) # show the L1 norm of mpsc
                     error=abs(last_cpr_err-self.cpr_err)
                     last_direction = 1                
             if (norm==0):
                 self.normalizeProba()
 
     def normalizeProba(self):
-        Ka=self.l1_norm**(1.0/self.L)
-        self.mpsc=[(self.mpsc[n])/Ka for n in range(self.L)]
+        try:
+            Ka=self.l1_norm**(1.0/self.L)
+            self.mpsc=[(self.mpsc[n])/Ka for n in range(self.L)]
+            self.negative_norm_flag=0
+        except ValueError:
+            print "Warning: Negative norm ("+str(self.l1_norm)+") obtained at t="+str(self.t+1)+", maybe stuck in a local minimum."
+            print "Try to increase epsilon or decrease the number of sweeps and call compressionVariational() again."
+            self.negative_norm_flag=1

@@ -58,7 +58,7 @@ class MpsSolver(Solver):
             self.partial_overlap_lr=[None]*self.L;
             self.partial_overlap_rl=[None]*self.L;
             self.cpr_err=0
-            self.epsil=0.0000000001
+            self.epsil=0.00001
             self.negative_norm_flag=0
         else:
             raise Exception("The model is not supported!")

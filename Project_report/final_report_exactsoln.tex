@@ -1,0 +1,49 @@
+\documentclass[english]{article}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{amstext}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{babel}
+\usepackage{courier}
+\usepackage[margin=1in]{geometry}
+
+
+\begin{document}
+
+
+\section{Exact Solution - Transitional Matrix}
+
+\subsection{Solving the Problem in Theory}
+	The many body problem is treated one dimensionally, with $n$ agents on a line at positions $i=1,2,\cdots,n$. Each body can occupy one of two states $(1,0)^T$ and $(0,1)^T$, corresponding to a state space of size $2^n$. The dynamics of the system at each time step can be represented by the following probability transition matrix:
+\begin{displaymath}
+H = pI + (1-p)\sum_{i=1}^{n-1}\frac{1}{n-1}\sigma_i^x\otimes\sigma_{i+1}^x,
+\end{displaymath}
+where $I$ is a $2^n\times2^n$ identity matrix and
+\begin{displaymath}
+\sigma_i^x =
+\begin{pmatrix}
+0 & 1 \\
+1 & 0
+\end{pmatrix}
+\end{displaymath}
+operates on the state space of position $i$.  Qualitatively, the transition matrix models the system by capturing interactions between neighboring bodies. A body's state remains constant with probability $p$, and flips its state with probability  $(1-p)/(N-1)$. Consider the $Angry Boys$ model as an example: the system is an abstraction of boys standing in a line, and their mood is in a state of either  "anger" $(1,0)^T$ or "tranquility" $(0,1)^T$. Their respective states are in turn influenced by their left and right neighbors.
+
+\subsection{Solving the Problem Computationally}
+	Simulating a solution to the many body problem is computationally intense. Construction of the transition matrix at each time step requires a summation over $N$ indices of $\sigma_{i}$
+simultaneously, meaning $m^{N}$ terms are examined. For a simply model where a body occupies one of two elemetary states, $m^{N}\approx10^{9}$ for $N=30$. A simulation of $40$ sites is impossible.  Nonetheless, an exact solution class $ExactSolver$ bounded by reasonably-sized state spaces has been constructed as a corroboration of results obtained through the MPS algorithm.
+
+The $ExactSolver$ class takes the $Solver$ class as its parent. Its dependencies include the $numpy$ library, the deepcopy function of the $copy$ library, and a $Boys$ model from its respective parent class. Three functions defined in the class - $interpreter$, $step$, and $evolve$ - conduct simulation. Data from the simulation is collected in the form of lists. One list saves the state of the model at each time step, and one list saves the sum of probabilities at each step to ensure proper normalization of the model (probability cannot exceed 1).
+
+The $interpreter$ function accepts the imported model, reads its information, and initiates the simulation. The model's information consists of the beginning transition matrix and the initial state. Once the transition matrix is set, and the initial state is set and saved, simulation can commence. This represents a change from the alpha version; orginally, $interpreter$ itself was used to initiate the transition matrix and initial state. The beta version now offers functions to do this so that models with more diverse properties can interact with the solver. For instance, models reflecting influence from only a left or right neighbor can direct their unique transition matrix to $ExactSolver$. Additional control over initial state conditions is also given.
+
+The $step$ function is very simple. It first increments simulation time, and then produces a new state by calculating the tensor dot product of the transition matrix and previous state.
+
+The $evolve$ function controls the flow of the simulation by taking as its argument the total number of time steps desired for the simulation. $evolve$ calls $step$ to produce a new state, and then appends this state and its norm to its respective data list. This process is done iteratively for the number of time steps, producing a time evolution of the model. 
+
+
+
+
+\end{document}

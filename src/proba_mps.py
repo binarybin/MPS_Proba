@@ -46,7 +46,7 @@ if __name__=="__main__":
     """
     total_time = 100
 
-    angry_boys = AngryBoys(size = 200, remain_proba = 0.1, init_state = "all down")
+    angry_boys = AngryBoys(size = 100, remain_proba = 0.1, init_state = "all down")
 #    angry_boys = RadiatingBoys(size = 200, remain_proba = 0.1, nearest_neighbour_proba = 0.4, second_neighbour_proba = 0.5, init_state = "all down")
 #    angry_boys = ExponentialBoys(size = 200, J = 0.5, K = 0.5, init_state = "all down")
 #    angry_boys = ProjectionBoys(size = 200, p0 = 1.0, p1 = 2.0, q1 = 2.0, q2 = 2.0, init_state = "all down")
@@ -61,7 +61,7 @@ if __name__=="__main__":
     mps_measurement.measure()
     mpb = deepcopy(mps_measurement.measure_result_list)
     mps_measurement.clearMeasurement()
-    """
+    
     for i in range(total_time):
         mps_measurement.addMeasureTask(("Mean", i, [5]))
     mps_measurement.measure()
@@ -73,10 +73,10 @@ if __name__=="__main__":
     mps_measurement.measure()
     mva = deepcopy(mps_measurement.measure_result_list)
     mps_measurement.clearMeasurement()
-    """
+    
     pylab.plot(range(len(mpb)), mpb, "-o", label = "mps, joint probability")
-#    pylab.plot(range(len(mmn)), mmn, "-o", label = "mps, mean")
- #   pylab.plot(range(len(mva)), mva, "-o", label = "mps, variance")
+    pylab.plot(range(len(mmn)), mmn, "-o", label = "mps, mean")
+    pylab.plot(range(len(mva)), mva, "-o", label = "mps, variance")
     
     pylab.legend(loc="lower right")
     pylab.xlabel("time")

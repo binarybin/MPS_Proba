@@ -46,7 +46,7 @@ if __name__=="__main__":
     """
     total_time = 40
 
-#    angry_boys = AngryBoys(size = 10, remain_proba = 0.1, init_state = "all down")
+    angry_boys = AngryBoys(size = 10, remain_proba = 0.1, init_state = "all down")
 #    angry_boys = RadiatingBoys(size = 100, remain_proba = 0.1, nearest_neighbour_proba = 0.4, second_neighbour_proba = 0.5, init_state = "all down")
 #    angry_boys = ExponentialBoys(size = 10, J = 0.5, K = 0.5, init_state = "all down")
 #    angry_boys = ProjectionBoys(size = 100, p0 = 1.0, p1 = 2.0, q1 = 2.0, q2 = 2.0, init_state = "all down")

@@ -478,7 +478,18 @@ Fig.\ref{fig:Projection_result} is the result of the Projection Boys Model.
   \caption{Results of Exponential Boys Model.(a) gives the comparison of the joint probability, the mean value, and the variance between the MPS method and exact method. The chain size is 10, and the bound dimension $\chi$ is 10 in the MPS method. (b) shows the decay of square error sum with  increasing bound dimensions. The error is computed between the approximation and exact methods with a fixed time step of 100. (c) is the result of the MPS method on a long chain with the size $L=150$. (d) compares the joint probability of the MPS method with two bound dimensions. The two curves converge in the long run.}
   \label{fig:Projection_result}
 \end{figure}
+\section{Conclusion}
+Physics research has stimulated many ideas in mathematics for centuries, from Newton's famous invention of calculus to differential equations in the 19th century, up till fiber bundles in modern geometry and tensor category in modern algebra, inspired by particle physics. We believe that, as physics uses more computer technology in the past several decades, it should also inspire some ideas in computer science. This project is an attempt for this goal.
 
+The structures in quantum many body physics resembles much the classical probability theory, with the exception of interpreting the 2-norm rather than 1-norm as probability. Physicists developed many methods to compute the time evolution of states (or "wave functions") in the context of quantum mechanics, and we naturally extend this MPS approach to classical probability theory.
+
+It is proved in the physics context that the bound dimension of the MPS does not grow with the chain length for a 1-D problem, which is called the area law. An intuitive way to understand is that, if only the states in a finite range connect to each other, a cut in the chain will break some "information sharing", but the amount of the broken information does not grow with the chain length. While it is unclear whether we have a similar "area law" in this probability context, it worths to give it a try.
+
+As our results have shown, the algorithm works very well for short and intermediate length chains and we need a larger bound dimension to get a good result for the joint probability. It is still an open question what the proper bound dimension is, but in most of the cases, a chain of length 200 can be solved with a bound dimension of 20.
+
+\noindent \textbf{What do we learn?}
+
+Developing code in a group collaboration is not an easy process, and we managed it quite well. We held several design meetings in the beginning and discussed the algorithm quite thoroughly. The task assignment is very clear and everyone worked on different files to resolve the collisions easily. The process that we could improve next time is that, when writing the report, we did not split the sections in different files, which caused many collision problems.
 \begin{thebibliography}{99}
 \bibitem{white} S. R. White, {\it Physical Review Letters} {\bf 69}, 2863 (1992)
 \bibitem{schollwock} Ulrich Schollwoeck, {\it Annals of Physics} {\bf 326}, 96 (2011)

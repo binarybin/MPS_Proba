@@ -6,7 +6,6 @@ from numpy import arange, sin, pi
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
 import Tkinter as Tk
-import tkFileDialog
 
 import sys
 from copy import deepcopy
@@ -32,7 +31,13 @@ class gui_main(Tk.Tk):
         self.initVariables()
         
     def initVariables(self):
-        pass
+#        self.model_dict = {"AngryBoys": AngryBoys, "RadiatingBoys": RadiatingBoys, "ExponentialBoys": ExponentialBoys, "ProjectionBoys": ProjectionBoys}
+        self.model = None
+        if self.v_model.get() == "AngryBoys":
+            # Do something to get parameters for AngryBoys
+            
+            
+        
            
     def setPlotFrame(self):
         self.plot_frame = Tk.Frame(self)
@@ -77,7 +82,7 @@ class gui_main(Tk.Tk):
         
         self.v_model = ""
         for i, text in enumerate(self.model_list):
-            Tk.Radiobutton(self.control_frame, text=text, variable=self.v_model, value=text).grid(row=3, column=i)
+            Tk.Radiobutton(self.control_frame, text=text, variable=self.v_model, value=text, indicatoron=0).grid(row=3, column=i)
 
         self.compare_with_exact = Tk.IntVar()
         Tk.Checkbutton(self.control_frame, text = "Compare with exact solution", variable = self.compare_with_exact).grid(row=4,column=1)
@@ -127,10 +132,6 @@ class gui_main(Tk.Tk):
     def _quit(self):
         self.quit()     # stops mainloop
         self.destroy()  # this is necessary on Windows to prevent
-
-    def getModelFile(self):
-        self.filename=tkFileDialog.askopenfilename()
-        print self.filename
 
     
 

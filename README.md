@@ -9,23 +9,37 @@ A detailed description of the problems, models and the algorithm is in the docum
 
 Here is a quick start guide.
 ---
-* proba.py is the example main caller and you can tune the parameters in the main function. It runs both exact and mps models. It calculates the joint probability, the mean value and the variance in both models.
+* proba.py is an example main caller and you can tune the parameters in the main function. It runs both exact and mps models. It calculates the joint probability, the mean value and the variance in both models at any time point. And it can compare the exact solution and the MPS solution for short chains. The exact method can only calculate a short chain. When the size of the chain is larger than 14, it will throw an error message.
+* proba_mps.py is the caller for MPS method. It unitlizes MPS to calculate the time evolution of the state, and calculates the joint probability, the mean value and the variance at any time point. You may choose the total time steps, the size of the chain, the bound dimensions and the probability parameters in each model. It has four models and the user can choose which model to use. For example, angry_boys = AngryBoys(size = 200, remain_proba = 0.1, init_state = "all down") input the parameters for Angryboys model.
 * model.py defines pure model class for all the model classes. 
-* exactsolver.py and mpssolver.py define two solvers: the former is the traditional transitional matrix method and the latter is the MPS solver. You can compare them for small sizes.
+* solver.py defines the base solver class. 
+* exactsolver.py defines the exact traditional matrix method.
+* mpssolver.py defines the MPSsolver for the matrix product states method. It has the following variables that the user can tune according to his needs. 
+    L: length of the chain. 
+    bound_dimension: dimension of the auxilary space for the compressed MPS
+    n: dimension of the physical space
+    mps: current state expressed in mps. It is the mps obtained after apply the mpo
+    mpsc: current compressed mps. It is obtained by calling compression algorithm
+    mpo: operator. By convention we always apply mpo on mpsc
+    partial_overlap_lr, partial_overlap_rl: the partial overlap between mps and mpsc. this is only useful in the algorithm of compression by variation
+    results: list of mps keeping the history
+    t: current time
+    epsil: error threshold for CompressionVariational.
+    cpr_err: error of the compression(L2 distance between compressed state and true state).
+The included functions are:
+CompressionSVDSweepToRight and CompressionSVDSweepToLeft are the two methods for SVD compression
 
 * measurement.py defines the base measurement classe Measurement for all the measurement classes. It can compute the joint probability, correlation function, variance, and mean value at any time point. For the last two calculations, user can define specific values for being angry (up) or calm (down), and by default, they are 1 and -1 respectively. Both time and site number counts from 0, and a python-way of specifying the number from the end of list is also accepted. Each measurement task must be specified in a particular way, though measurement time can be omitted, in which case it is taken to be the most recent time computed. The class uses the solver to initialize, and the measure functions take the same input. They have different requested tasks and each measurement function should check the task properties. It will raise an exception if it does not fit. 
-  For example, ("correlation", 1, [1, 2, 3, 4, 5]) measures <S1*S2*S3*S4*S5> at t = 1, task_type_string = "Correlation", "Mean", "Variance", "Proba", more to be added some examples:("Correlation", 1, [1, 2, 3, 4, 5]) ("Mean", 1, [1]) ("Variance", 1, [1])("Proba", [(1, "up"), (3, "down")])It contains the following functions:
-    1 addMeasureTask(self, task): The user can add different tasks by this function. The task is a tuple that shows up in the form (task_type_string, time_point, [points of interest]). Note in each task tuple, the integer following the task name will always be taken as the time step for all measurement. If time_point is not given, then it is assumed to be the last time step in calculation. It can also be negative which then follows Python's convention.
-    2 measureProba(self, task): This function implements the measurement of the probability (possibly joint probability) for an event or several events to be realized
-    3 measureCorrelation(self, task, up=None, down=None): This implements the measurement of the n-point correlation function
-    4 measureMean(self, task, up=None, down=None): It calculates the mean value of the model.
-    5 measureVariance(self, task, up=None, down=None): Variance is a special case of correlation, with only one variable. Just find the correct type and call measureCorrelation.
-    6 getTimeTask(self, task, task_temp): For a given task, find the time for the computation and the true tasks. If the second element in the task is an integer, then it is taken as the time. If time is not given in the task at the second position, then it is the last one. task_temp is the list that stores true tasks.
+  For example, ("correlation", 1, [1, 2, 3, 4, 5]) measures <S1*S2*S3*S4*S5> at t = 1, task_type_string "Correlation", "Mean", "Variance", "Proba", more to be added some examples:("Correlation", 1, [1, 2, 3, 4, 5]) ("Mean", 1, [1]) ("Variance", 1, [1])("Proba", [(1, "up"), (3, "down")])It contains the following functions:
+      1. addMeasureTask(self, task): The user can add different tasks by this function. The task is a tuple that shows up in the form (task_type_string, time_point, [points of interest]). Note in each task tuple, the integer following the task name will always be taken as the time step for all measurement. If time_point is not given, then it is assumed to be the last time step in calculation. It can also be negative which then follows Python's convention.
+      2. measureProba(self, task): This function implements the measurement of the probability (possibly joint probability) for an event or several events to be realized
+      3. measureCorrelation(self, task, up=None, down=None): This implements the measurement of the n-point correlation function
+      4. measureMean(self, task, up=None, down=None): It calculates the mean value of the model.
+      5. measureVariance(self, task, up=None, down=None): Variance is a special case of correlation, with only one variable. Just find the correct type and call measureCorrelation.
+      6. getTimeTask(self, task, task_temp): For a given task, find the time for the computation and the true tasks. If the second element in the task is an integer, then it is taken as the time. If time is not given in the task at the second position, then it is the last one. task_temp is the list that stores true tasks.
+* mpsmeasurement.py: It is the derived measurement class for MPS. It has the following assumptions: for a mps, physical index 0 represents down and physical index 1 represents up. solver.results has elements time ordered and start from time 0. the sites start from 0. The first mps is of shape (2,1,n), and the last mps of shape (2,n,1).
+* exactmeasurement.py: It is the derived measurement classes for exact solution. 
 
-
-
-* exactmeasurement.py and mpsmeasurement.py are derived measurement classes that can compute mean, variance, correlation functions and joint probability for each model.
-* proba_mps.py is the caller 
 
 This project is still in progress and is subject to the GPL 2 licence. Please feel free to contact the authors if you have some questions or suggestions.
 

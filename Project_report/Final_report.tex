@@ -211,6 +211,9 @@ Note that if we would to calculate the expectation of a physical quatity, or the
 The \texttt{Compression} function of MPS will work iteratively. To initialize for the compression, we apply SVD to the MPS representation of the states, and then truncate the decomposed matrices with $\chi$ largest single values retained. The following steps of compression minimize $||\psi^i-\psi^{i-1} ||^{2}$ iteratively, where $\psi^{i-1}$ is the state from the previous step while $\psi^i$ is the state obtained for the new $ith$ step. The extrema condition in minimizing $||\psi^i-\psi^{i-1} ||^{2}$ require solving linear equations to get the new coefficients in the new matrices of the $ith$ step. After that the new state is normalized.
 \\[3mm]
 
+\subsection{Model Class}
+We defined an abstract model class in model.py which contains several frequently used components in the MPO. Each specific model is a derived class from Model class and they contain a string description of the model, model parameters, and a callable method to build the MPO representation and the transitional matrix for the user.
+
 \subsection{Measurement Class}
 \input{measurement.tex}
 \vspace{3mm}
@@ -268,6 +271,18 @@ Example: \texttt{self.compressionVariational(, 4, 1)} will perform 4 compression
 
 \input{results.tex}
 
+\section{Conclusion}
+Physics research has stimulated many ideas in mathematics for centuries, from Newton's famous invention of calculus to differential equations in the 19th century, up till fiber bundles in modern geometry and tensor category in modern algebra, inspired by particle physics. We believe that, as physics uses more computer technology in the past several decades, it should also inspire some ideas in computer science. This project is an attempt for this goal.
+
+The structures in quantum many body physics resembles much the classical probability theory, with the exception of interpreting the 2-norm rather than 1-norm as probability. Physicists developed many methods to compute the time evolution of states (or "wave functions") in the context of quantum mechanics, and we naturally extend this MPS approach to classical probability theory.
+
+It is proved in the physics context that the bound dimension of the MPS does not grow with the chain length for a 1-D problem, which is called the area law. An intuitive way to understand is that, if only the states in a finite range connect to each other, a cut in the chain will break some "information sharing", but the amount of the broken information does not grow with the chain length. While it is unclear whether we have a similar "area law" in this probability context, it worths to give it a try.
+
+As our results have shown, the algorithm works very well for short and intermediate length chains and we need a larger bound dimension to get a good result for the joint probability. It is still an open question what the proper bound dimension is, but in most of the cases, a chain of length 200 can be solved with a bound dimension of 20.
+
+\noindent \textbf{What do we learn?}
+
+Developing code in a group collaboration is not an easy process, and we managed it quite well. We held several design meetings in the beginning and discussed the algorithm quite thoroughly. The task assignment is very clear and everyone worked on different files to resolve the collisions easily. The process that we could improve next time is that, when writing the report, we did not split the sections in different files, which caused many collision problems.
 
 \begin{thebibliography}{99}
 \bibitem{white} S. R. White, {\it Physical Review Letters} {\bf 69}, 2863 (1992)

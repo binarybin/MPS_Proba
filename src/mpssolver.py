@@ -76,6 +76,7 @@ class MpsSolver(Solver):
     def evolve(self,nstep):
         for i in range(nstep):
             if (self.negative_norm_flag==0):
+		print "Step ", i
                 self.step()
             else:
                 break

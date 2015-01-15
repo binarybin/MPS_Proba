@@ -71,17 +71,17 @@ adds a specific measurement task. The task object is formed as a tuple that cont
 ```
 ("Correlation", 1, [1, 2, 3, 4, 5])
 ```
-means <S1 S2 S3 S4 S5> at t = 1
+means \<S1 S2 S3 S4 S5\> at t = 1
 
 ```
 ("Correlation",  [1, 2, 3, 4, 5]) 
 ```
-means <S1 S2 S3 S4 S5> at the last time point
+means \<S1 S2 S3 S4 S5\> at the last time point
 
 ``` 
 ("Mean", 1, [-1])
 ```
-means <SN> at t = 1, for a chain of length N
+means \<SN\> at t = 1, for a chain of length N
 
 ```
 ("Variance", 1, [1])

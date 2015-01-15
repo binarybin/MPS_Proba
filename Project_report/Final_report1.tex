@@ -1,4 +1,4 @@
-\documentclass[english]{article}
+\documentclass[english]{article}[12pt]
 \usepackage{graphicx}
 \usepackage[T1]{fontenc}
 \usepackage[latin9]{inputenc}
@@ -89,7 +89,7 @@ The usual way to specify a general state vector is by enumerating its amplitudes
 \begin{displaymath}
 |\psi\rangle: \mathcal{S}^{\otimes N} \rightarrow \mathbb{K}
 \end{displaymath}
-where $\mathbb{K}$ is the range of all amplitudes. In this situation, the function is represented as a table of values. On the other hand, we can also represent a function as an analytic expression like Taylor expansion or by some algebraic relations. Such a representation is exactly what Matrix Product State exploits. In this case, (as the name suggests) the function is represented by a product of matrices. Specifically, we have
+where $\mathbb{K}$ is the range of all amplitudes. In this situation, the function is represented as a table of values. On the other hand, we can also represent a function as an analytic expression like Taylor expansion or by some algebraic relations. Such a representation is exactly what matrix product state exploits. In this case, (as the name suggests) the function is represented by a product of matrices. Specifically, we have
 \begin{displaymath}
 \begin{split}
 |\psi\rangle: \mathcal{S}^{\otimes N} &\rightarrow \mathbb{K} \\s
@@ -242,7 +242,7 @@ where $I$ is a $2^n\times2^n$ identity matrix and
 1 & 0
 \end{pmatrix}
 \end{displaymath}
-as described in Model. If he is angry, he has a probability p of remaining angry, but also a probaility p of becoming happy. This model also intends a boy to be influenced with equal probability by its left and right neighbors in larger chains. Two emotional boys have probability p that they will change their state together - otherwise, they remain in their respective states. In the case of N emotional boys, a pair of nearest neighbors will change states together with probability p, and otherwise remain in their respective states.
+as described in Model. If he is angry, he has a probability $p$ of remaining angry, but also a probability p of becoming happy. This model also intends a boy to be influenced with equal probability by its left and right neighbors in larger chains. Two emotional boys have probability $p$ that they will change their state together - otherwise, they remain in their respective states. In the case of N emotional boys, a pair of nearest neighbors will change states together with probability $p$, and otherwise remain in their respective states.
 
 
 The MPO of this model is 
@@ -269,7 +269,7 @@ Consider now a situation where the boys are impacted by more than just their nea
 \begin{displaymath}
 H=p_0 I + p_1 \sum_{i=1}^{n-1}\frac{1}{n-1}\sigma_i^x\otimes\sigma_{i+1}^x + p_2 \sum_{i=1}^{n-2}\frac{1}{n-2}\sigma_i^x\otimes\sigma_{i+2}^x
 \end{displaymath}
-This model is similar to the Angry Boys model, but now depends additionally on a second-nearest neighbor interaction. In the case of N emotional boys, a pair of nearest neighbors and a pair of second-nearest neighbors influence eachother, but at different rates. Sites adjacent to each other will change together with probability $p_{1}$, and otherwise remain in their respective states. Sites separated by a single site can also now change together with  probability $p_{2}$, and otherwise remain in their respective states.
+This model is similar to the AngryBoys model, but now depends additionally on a second-nearest neighbor interaction. In the case of N emotional boys, a pair of nearest neighbors and a pair of second-nearest neighbors influence each other, but at different rates. Sites adjacent to each other will change together with probability $p_{1}$, and otherwise remain in their respective states. Sites separated by a single site can also now change together with  probability $p_{2}$, and otherwise remain in their respective states.
 
 
 The MPO can be decomposed into the following matrices:
@@ -295,7 +295,7 @@ Consider again a line of boys; however, this time the state of each boy is a res
 \begin{displaymath}
 H = P (I + J \sum_{i=1}^{n-1} \sum_{j=i+1}^{n-1} K^{j-i}\sigma_i^x\otimes\sigma_j^x)
 \end{displaymath}
-Each site in this model is in turn influenced by an interaction with the remaining sites in the chain. A single site can change its state along with any other site, but this occurrence has a probability P which decays exponentially as the two sites increase in distance from one-another.
+Each site in this model is in turn influenced by an interaction with the remaining sites in the chain. A single site can change its state along with any other site, but this occurrence has a probability $p$ which decays exponentially as the two sites increase in distance from one-another.
 
 The MPO of this model comprises of matrices:
 $$W^{i}=
@@ -318,7 +318,7 @@ Finally, consider again the first AngryBoys model, but subject to random events.
 \begin{displaymath}
 H = p_0 I +  \sum_{i=1}^{n-1}(\frac{p_1}{n-1}\sigma_i^x\otimes\sigma_{i+1}^x + \frac{q_1}{n-1}\pi_i^+\otimes\pi_{i+1}^- + \frac{q_2}{n-1}\pi_i^+\otimes\pi_{i+1}^-)
 \end{displaymath}
-As before, a pair of sites in a chain of size N can change state with probability p. However, $\pi$ matrices given by:
+As before, a pair of sites in a chain of size N can change state with probability $p$. However, $\pi$ matrices given by:
 $$\pi^{+}=
 \begin{pmatrix}
 1 & 1 \\
@@ -459,11 +459,11 @@ where $\sigma_i^0=\sigma_i^1=1$ for all sites except $i_1$, $i_2,\cdots,i_n$, wh
 \subfigure[Exact Model(Short Chain)]{
 \includegraphics[scale=0.4]{Result_Fig/Angry_Exact_t50_s10_bd10.eps}}\hfill
 \subfigure[Error with Different Bound Dimension]{
-\includegraphics[scale=0.4]{Result_Fig/Angry_Error_t100_s10_bd10_log.eps}}
+\includegraphics[scale=0.4]{Result_Fig/Angry_Error_t100_s10_bd10_log.pdf}}
 \subfigure[MPS long chain]{
-\includegraphics[scale=0.4]{Result_Fig/Angry_MPS_t200_s100_bd10.eps}}\hfill
+\includegraphics[scale=0.4]{Result_Fig/Angry_MPS_t200_s100_bd10.pdf}}\hfill
 \subfigure[MPS with Different Bound Dimension]{
-\includegraphics[scale=0.4]{Result_Fig/Angry_MPS_t200_s80_bd10to20.eps}}
+\includegraphics[scale=0.4]{Result_Fig/Angry_MPS_t200_s80_bd10to20.pdf}}
   % \end{minipage}\\[1em]
   \caption{Results of Angry Boys Model.(a) gives the comparison of the joint probability, the mean value, and the variance between the MPS method and exact method. The chain size is 10, and the bound dimension $\chi$ is 10 in the MPS method. (b) shows the decay of square error sum with increasing bound dimensions. The error is computed between the approximation and exact method with a fixed time step of 100. (c) is the result of MPS method on a long chain with the size $L=100$. (d) compares the joint probability of the MPS method with two bound dimensions. The two curves converge in the long run.}
   \label{fig:Angry_result}
@@ -476,11 +476,11 @@ Fig.\ref{fig:Radiating_result} is the result of the Radiating Boys Model.
 \subfigure[Exact Model(Short Chain)]{
 \includegraphics[scale=0.4]{Result_Fig/Radiating_Exact_t50_s10_bd10.eps}}\hfill
 \subfigure[Error with Different Bound Dimension]{
-\includegraphics[scale=0.4]{Result_Fig/Radiating_Error_t100_s10_bd10_log.eps}}
+\includegraphics[scale=0.4]{Result_Fig/Radiating_Error_t100_s10_bd10_log.pdf}}
 \subfigure[MPS long chain]{
-\includegraphics[scale=0.4]{Result_Fig/Radiating_MPS_t100_s30_bd10.eps}}\hfill
+\includegraphics[scale=0.4]{Result_Fig/Radiating_MPS_t200_s100_bd10.pdf}}\hfill
 \subfigure[MPS with Different Bound Dimension]{
-\includegraphics[scale=0.4]{Result_Fig/Radiating_MPS_t100_s30_bd10to20.eps}}
+\includegraphics[scale=0.4]{Result_Fig/Radiating_MPS_t200_s80_bd10to20.pdf}}
   % \end{minipage}\\[1em]
   \caption{Results of Radiating Boys Model.(a) gives the comparison of the joint probability, the mean value, and the variance between the MPS method and exact method. The chain size is 10, and the bound dimension $\chi$ is 10 in the MPS method. (b) shows the decay of square error sum with increasing bound dimensions. The error is computed between the approximation and exact methods with a fixed time step of 100. (c) is the result of the MPS method on a longer chain with size $L=30$. (d) compares the joint probability of the MPS method with two bound dimensions. The two curves converge in the long run.}
   \label{fig:Radiating_result}
@@ -493,11 +493,11 @@ Fig.\ref{fig:Exponential_result} is the result of the Exponential Boys Model.
 \subfigure[Exact Model(Short Chain)]{
 \includegraphics[scale=0.4]{Result_Fig/Exponential_Exact_t50_s10_bd10.eps}}\hfill
 \subfigure[Error with Different Bound Dimension]{
-\includegraphics[scale=0.4]{Result_Fig/Exponential_Error_t100_s10_bd10_log.eps}}
+\includegraphics[scale=0.4]{Result_Fig/Exponential_Error_t100_s10_bd10_log.pdf}}
 \subfigure[MPS long chain]{
-\includegraphics[scale=0.4]{Result_Fig/Exponential_MPS_t100_s40_bd10.eps}}\hfill
+\includegraphics[scale=0.4]{Result_Fig/Exponential_MPS_t200_s100_bd10.pdf}}\hfill
 \subfigure[MPS with Different Bound Dimension]{
-\includegraphics[scale=0.4]{Result_Fig/Exponential_MPS_t100_s40_bd10to20.eps}}
+\includegraphics[scale=0.4]{Result_Fig/Exponential_MPS_t200_s80_bd10to20.pdf}}
   % \end{minipage}\\[1em]
   \caption{Results of Exponential Boys Model.(a) gives the comparison of the joint probability, the mean value, and the variance between the MPS method and exact method. The chain size is 10, and the bound dimension $\chi$ is 10 in the MPS method. (b) shows the decay of square error sum with increasing bound dimensions. The error is computed between the approximation and exact methods with a fixed time step of 100. (c) is the result of the MPS method on a longer chain with the size $L=40$. (d) compares the joint probability of the MPS method with two bound dimensions. The two curves converge in the long run.}
   \label{fig:Exponential_result}
@@ -510,15 +510,25 @@ Fig.\ref{fig:Projection_result} is the result of the Projection Boys Model.
 \subfigure[Exact Model(Short Chain)]{
 \includegraphics[scale=0.4]{Result_Fig/Projection_Exact_t50_s10_bd10.eps}}\hfill
 \subfigure[Error with Different Bound Dimension]{
-\includegraphics[scale=0.4]{Result_Fig/Projection_Error_t100_s10_bd10_log.eps}}
+\includegraphics[scale=0.4]{Result_Fig/Projection_Error_t100_s10_bd10_log.pdf}}
 \subfigure[MPS long chain]{
-\includegraphics[scale=0.4]{Result_Fig/Projection_MPS_t400_s200_bd10.eps}}\hfill
+\includegraphics[scale=0.4]{Result_Fig/Projection_MPS_t200_s100_bd10.pdf}}\hfill
 \subfigure[MPS with Different Bound Dimension]{
-\includegraphics[scale=0.4]{Result_Fig/Projection_MPS_t200_s150_bd10to20.eps}}
+\includegraphics[scale=0.4]{Result_Fig/Projection_MPS_t200_s80_bd10to20.pdf}}
   % \end{minipage}\\[1em]
   \caption{Results of Exponential Boys Model.(a) gives the comparison of the joint probability, the mean value, and the variance between the MPS method and exact method. The chain size is 10, and the bound dimension $\chi$ is 10 in the MPS method. (b) shows the decay of square error sum with  increasing bound dimensions. The error is computed between the approximation and exact methods with a fixed time step of 100. (c) is the result of the MPS method on a long chain with the size $L=150$. (d) compares the joint probability of the MPS method with two bound dimensions. The two curves converge in the long run.}
   \label{fig:Projection_result}
 \end{figure}
+
+\section{Profiling}
+To have an idea of how time is consumed in our MPS solver, we pick an angry model boy of length 100 and make it evole for $t=5$. We pick $10$ the bound dimension for compression. Fig.\ref{fig:prof} shows the output of calling cProfile. It takes 40.049 seconds in total to finish the computation. We observe that 33.197 seconds are consumed by the function \texttt{tensordot()}, which basically handles all the n-dimensional array multiplication. Indeed \texttt{tensordot()} comes with the \texttt{numpy} package which has already been implemented by some lower-level languange and optimized for intensive computation. Therefore we believe that implementing our project in C++ will not significantly accelerate the computation. 
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{Result_Fig/profiling.png}
+\caption{Output of Cprofiling on executing \texttt{evolve(5)} for an angry boy model. The highlighting line shows the time consumed by the function \texttt{tensordot}}
+\label{fig:prof}
+\end{figure} 
+
 \section{Conclusion}
 From Newton's famous invention of calculus, to differential equations in the 19th century, fiber bundles in modern geometry, and tensor category in modern algebra inspired by particle physics; there can be no doubt physics research has stimulated many ideas in mathematics for centuries. We believe that, as physics has adopted computer technology over the past several decades, it should also inspire more ideas in computer science. This project is an attempt at attaining this goal.
 
@@ -531,6 +541,7 @@ As our results have shown, the algorithm works very well for short and intermedi
 \noindent \textbf{What did we learn?}
 
 Developing code using group collaboration is not an easy process, but we managed it quite well. We held several design meetings in the beginning and discussed the algorithm quite thoroughly. The task assignment was very clear and everyone worked on different files to resolve any ensuing collisions easily. The process we could improve in the future is managin writing of the final report. We did not split sections in different files wisely, which caused many collision problems.
+\newpage
 \begin{thebibliography}{99}
 \bibitem{white} S. R. White, {\it Physical Review Letters} {\bf 69}, 2863 (1992)
 \bibitem{schollwock} Ulrich Schollwoeck, {\it Annals of Physics} {\bf 326}, 96 (2011)

@@ -1,0 +1,301 @@
+\documentclass[english]{article}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{amstext}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{babel}
+\usepackage{courier}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subfigure}
+
+\begin{document}
+
+\title{Final Documentation: \\Matrix Product States for Probability Dynamics}
+
+
+\author{Peter Gjeltema (gjeltema@princeton.edu)
+	   \\ Peiqi Wang (peiqiw@princeton.edu)
+	    \\ Jun Xiong (xiong@princeton.edu) 
+	    \\ Bin Xu (binx@princeton.edu) 
+	    \\ Liangsheng Zhang(liangshe@princeton.edu)}
+	    
+\date{\today}
+
+\maketitle
+
+\section{Introduction}
+
+The matrix product state (MPS) is a novel numerical algorithm that is
+widely used in quantum many-body physics. For a problem of quantum
+spin chains, the states live in a Hilbert space expanded by the states
+of each spin (referred to as ``orbitals'' hereafter), and the dimension
+of that Hilbert space is $m^{N}$ for a chain of length $N$ where each orbital has $m$ choices. 
+The dimension of the state space
+grows exponentially with $N$, making it extremely hard to simulate
+a system consisting of a few dozen sites. 
+
+In 1995, White \cite{white} proposed
+the density matrix renormalization group (DMRG), which proves to be an extremely efficient algorithm for one dimensional systems. Researchers of the next decade were aware of the ubiquitous relation between entanglement and dimensionality allowing the state to be approximated as the product of matrices \cite{schollwock}. Some recent developments include extension of the algorithm to higher dimensions\cite{cirac} and to critical systems\cite{vidal}.
+
+This inter-departmental collaborative work applies this algorithm to other interesting problems. The algorithm's inherent probabilistic nature motivates its application to other difficult problems in probability theory and stochastic processes. An especially interesting example is the Markov process consisting of many degrees of freedom, which also forms an exponentially growing state space. 
+
+We have developed  a generic MPS solver and compare results from some simple applications with that of exact transition matrix solutions. We start with a simple model of the dynamics of human relations (``Angry Boys" model), and move on to included other more sophisticated models. Due to the time limitation, this project focuses on one dimensional models for which the algorithm is well-established in physics. Higher dimensionality or highly correlated relationships offering the most realistic relevance will be left to future work.
+
+\section{Background}
+
+\subsection{The difficult many body problem}
+
+When we have a state as a vector in the Hilbert space, it is expressed
+as
+
+\[
+|\psi\rangle=\sum_{\{\sigma_{i}\}}A_{\{\sigma_{i}\}}|\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}\rangle
+\]
+where $|\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}\rangle$
+is a product basis of the local Hilbert space on different sites.
+
+Applying a linear time-evolution operator $\hat{O}$ on this state,
+the general form of $\hat{O}$ is
+
+\[
+\hat{O}=\sum_{\{\sigma\},\{\sigma'\}}|\sigma'_{1}\sigma'_{2}\sigma'_{3}\cdot\cdot\cdot\sigma'_{N}\rangle\langle\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}|O_{\{\sigma'\}\{\sigma\}}
+\]
+where $\langle\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}|$ is a vector in the dual Hilbert space and $O_{\{\sigma'\}\{\sigma\}}$ is a complex number that represents the amplitude of transition. The application of this operator on the state is naturally written as
+\[
+\hat{O}|\psi\rangle=\sum_{\{\sigma\},\{\sigma'\}}|\sigma'_{1}\sigma'_{2}\sigma'_{3}\cdot\cdot\cdot\sigma'_{N}\rangle\langle\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}|\ O_{\{\sigma'\}\{\sigma\}}\sum_{\{\sigma''_{i}\}}A_{\{\sigma_{''i}\}}|\sigma''_{1}\sigma''_{2}\sigma''_{3}\cdot\cdot\cdot\sigma''_{N}\rangle
+\]
+Using the orthonormal condition of basis, it can be simplified to
+
+\[
+\hat{O}|\psi\rangle=\sum_{\{\sigma_{i}\}\{\sigma'_{i}\}}A_{\{\sigma_{i}\}}O_{\{\sigma'\}\{\sigma\}}|\sigma'_{1}\sigma'_{2}\sigma'_{3}\cdot\cdot\cdot\sigma'_{N}\rangle
+\]
+
+
+Despite its simple form, the actual computation is very difficult since
+the summation is conducted over $N$ indices of $\sigma_{i}$
+simultaneously. Therefore, $m^{N}$ terms are computed. For the simplest case when
+$m=2$ (only two elementary states for one site), $m^{N}\approx10^{9}$
+for $N=30$, taking more than $10$ seconds for one single contraction.
+The chain of $40$ sites is obviously intractable.
+
+
+\subsection{Matrix Product States (MPS)}
+
+To deal with the large number of terms in the contraction, we effectively split the space. Let's focus on the coefficient $A_{\{\sigma_{i}\}}=A_{\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}}$.
+From a direct point of view, it is a rank-N tensor which has N indices,
+but we can group some indices so that it becomes $A_{\sigma_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
+with only $2$ indices where the first has $m$ possible values and
+the second has $m^{N-1}$. Grouping $N-1$ indices means making a
+bijection map from $N-1$ numbers varying between $1$ and $m$ to
+a single integer varying from $1$ to $m^{N-1}$. This re-indicing
+trick is crucial in MPS algorithms.
+
+We then treat this bi-index object $A_{\sigma_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
+as a matrix with $\sigma_{1}$ the row index and $(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})$
+the column index, thus forming a $m\times m^{N-1}$ matrix. Applying
+singular value decomposition (SVD) on this matrix gives 
+\[
+A_{\sigma_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=U_{m_{1}}^{\sigma_{1}}S_{m_{1}m_{2}}V_{m_{2}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=U_{m_{1}}^{\sigma_{1}}\tilde{V}_{m_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}
+\]
+where $U$ is a $m\times m$ unitary matrix and $S$ is a $m\times m$
+diagonal matrix with non-negative diagonal elements arranged in descending
+order. We apply a similar procedure on $\tilde{V}_{m_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
+by re-arranging indices as $\tilde{V}_{m_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=\tilde{V}_{(m_{1}\sigma_{2})(\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
+and applying a similar SVD:
+
+\[
+\tilde{V}_{(m_{1}\sigma_{2})(\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=U_{(m_{1}\sigma_{2})m_{2}}S_{m_{2}m_{2}'}V_{m_{2}'(\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=U_{m_{1}m_{2}}^{\sigma_{2}}\tilde{V}_{m_{2}(\sigma_{3}\cdot\cdot\cdot\sigma_{N})}
+\]
+where the second ``$=$'' reshapes the $U$ matrix and multiplied
+the $S$ and $V$ matrices. 
+
+Noticing that $\tilde{V}_{m_{2}(\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
+is almost the same as $\tilde{V}_{m_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
+except for having one fewer $\sigma_{i}$, we apply this procedure
+inductively and write the original coefficient tensor as
+
+\[
+A_{\{\sigma_{i}\}}=U_{m_{1}}^{\sigma_{1}}U_{m_{1}m_{2}}^{\sigma_{2}}U_{m_{2}m_{3}}^{\sigma_{3}}\cdot\cdot\cdot U_{m_{N-1}m_{N}}^{\sigma_{N}}
+\]
+This form is called the matrix product state, $\sigma_{i}$'s
+are called ``physical indices', and $m_{i}$'s are called ``auxiliary
+indices''. It is worth noting that, in general, operators can also
+be decomposed in this way, although it is usually more convenient
+to directly construct operators in matrix product form. This representation
+is extremely convenient since each matrix $U$ contains only one physical
+index, and the application of a matrix product linear operator
+on a matrix product state only involves the contraction of a few indices.
+
+To illustrate, if we have a linear operator $O_{\{\sigma'\}\{\sigma\}}=O_{n_{1}}^{\sigma'_{1}\sigma_{1}}O_{n_{1}n_{2}}^{\sigma'_{2}\sigma_{2}}O_{n_{2}n_{3}}^{\sigma'_{3}\sigma_{3}}\cdot\cdot\cdot O_{n_{N-1}n_{N}}^{\sigma'_{N}\sigma_{N}}$
+then applying this operator on the MPS is actually the contraction
+on $m$, $n$ and $\sigma_{i}$ space. The traditional way corresponds
+to first contracting $m$ and $n$ spaces, and then $\sigma$. However, this
+novel method contracts the $\sigma$ space first and then $m$ and
+$n$. The specific order of contraction is:
+\begin{itemize}
+\item Compute $\sum_{\sigma_{i}}O_{n_{i-1}n_{i}}^{\sigma'_{i}\sigma_{i}}A_{m_{i-1}m_{i}}^{\sigma_{i}}=M_{n_{i-1}n_{i}m_{i-1}m_{i}}^{\sigma'_{i}}$
+for all $i$'s
+\item $\sum_{n_{1}m_{1}}M_{n_{1}m_{1}}^{\sigma'_{1}}M_{n_{1}n_{2}m_{1}m_{2}}^{\sigma'_{2}}=\tilde{M}_{n_{2}m_{2}}^{\sigma'_{1}\sigma'_{2}}$
+\item $\sum_{n_{2}m_{2}}\tilde{M}{}_{n_{2}m_{2}}^{\sigma'_{1}\sigma'_{2}}M_{n_{2}n_{3}m_{2}m_{3}}^{\sigma'_{3}}=\tilde{M}_{n_{3}m_{3}}^{\sigma'_{1}\sigma'_{2}\sigma'_{3}}$
+\item keep doing this, until we finish the multiplication of all these objects
+and get $\tilde{M}^{\sigma'_{1}\sigma'_{2}\cdot\cdot\cdot\sigma'_{N}}=A_{\sigma'_{1}\sigma'_{2}\cdot\cdot\cdot\sigma'_{N}}$
+which is the final result, coefficients of the new state $|\psi'\rangle=\sum_{\{\sigma'_{i}\}}A_{\sigma'_{1}\sigma'_{2}\cdot\cdot\cdot\sigma'_{N}}|\sigma_{1}\sigma_{2}\text{\ensuremath{\cdot}}\text{\ensuremath{\cdot}}\text{\ensuremath{\cdot}}\sigma_{N}\rangle$.
+\end{itemize}
+
+\subsection{Approximation}
+
+It may seem unclear why our algorithm seems to transform a
+ problem scaling exponentially to polynomial time; indeed, it should be.
+We did not talk about the dimension of auxiliary space $m_{i}$ and
+$n_{i}$, which should grow exponentially. The method is useful
+only when the interaction is local or short-range, meaning the
+degree of freedom on one site  effectively interacts only with some
+of its neighbors. It is proven that in this case, the diagonal terms
+in the $S$ matrix decay exponentially, effectively enabling a cut-off
+in auxiliary space keeping only a finite number of $\chi$ dimensions. Thus, all $U$'s are at most $\chi\times\chi$ dimensional matrices.
+$\chi$ is in this case called the bound dimension. The effectiveness of this algorithm
+relies deeply on the fact that a large $\chi$ is unnecessary to achieving accurate
+results. It is proven that in all 1-dimensional problems away from critical
+points, $\chi$ does not grow with system size (the length); in critical
+1-dimensional models, $\chi\propto N^{\lambda}$ (polynomial) and
+in 2D, $\chi\propto\exp W$ which is the exponential of short dimension.
+
+
+\subsection{Matrix Product Operators (MPO)}
+The Hamiltonian in quantum mechanics, or equivalently the transitional matrix in stochastic processes, can be written as a series of matrix product operators where each matrix only applies on one site.
+We considered four different models to implement our MPS algorithm.
+\subsubsection{AngryBoys Model}
+Consider boys waiting in a line. Each boy's state can be defined as either an angry one, or a happy one. If we desire to model the individual states of the entire line of boys over time, we can implement a model dependent upon a transitional matrix method given by:
+\begin{displaymath}
+H = pI + (1-p)\sum_{i=1}^{n-1}\frac{1}{n-1}\sigma_i^x\otimes\sigma_{i+1}^x,
+\end{displaymath}
+where $I$ is a $2^n\times2^n$ identity matrix and 
+\begin{displaymath}
+\sigma_i^x = 
+\begin{pmatrix}
+0 & 1 \\
+1 & 0
+\end{pmatrix}
+\end{displaymath}
+as described in Model. If he is angry, he has a probability p of remaining angry, but also a probaility p of becoming happy. This model also intends a boy to be influenced with equal probability by its left and right neighbors in larger chains. Two emotional boys have probability p that they will change their state together - otherwise, they remain in their respective states. In the case of N emotional boys, a pair of nearest neighbors will change states together with probability p, and otherwise remain in their respective states.
+
+
+The MPO of this model is 
+$$
+O=W^{[1]}W^{[2]} ... W^{[L]}
+$$
+And can be encoded by the operator valued matrices below:
+$$
+W^{i}=
+\begin{pmatrix}
+I & 0 & 0 \\
+S_x & 0 & 0 \\
+0 & qS_x & I
+\end{pmatrix}
+$$
+where $W^1=\begin{pmatrix}p I & q S_x & I\end{pmatrix}$ on the first site of the chain, and
+$$W^L=\begin{pmatrix}
+I \\ S_x \\ 0
+\end{pmatrix}$$
+on the last site.
+
+\subsubsection{RadiatingBoys Model}
+Consider now a situation where the boys are impacted by more than just their nearest neighbor. Again returning to a transitional matrix method, we can implement another model given by:
+\begin{displaymath}
+H=p_0 I + p_1 \sum_{i=1}^{n-1}\frac{1}{n-1}\sigma_i^x\otimes\sigma_{i+1}^x + p_2 \sum_{i=1}^{n-2}\frac{1}{n-2}\sigma_i^x\otimes\sigma_{i+2}^x
+\end{displaymath}
+This model is similar to the Angry Boys model, but now depends additionally on a second-nearest neighbor interaction. In the case of N emotional boys, a pair of nearest neighbors and a pair of second-nearest neighbors influence eachother, but at different rates. Sites adjacent to each other will change together with probability $p_{1}$, and otherwise remain in their respective states. Sites separated by a single site can also now change together with  probability $p_{2}$, and otherwise remain in their respective states.
+
+
+The MPO can be decomposed into the following matrices:
+$$
+W^{i}=
+\begin{pmatrix}
+I & 0 & 0 & 0 \\
+S_x & 0 & 0 & 0 \\
+0 & I & 0 & 0 \\
+0 & p_1 S_x & p_2 S_x & I
+\end{pmatrix}
+$$
+ $$W^1=\begin{pmatrix}p_0 I & p_1 S_x & p_2 S_x & I\end{pmatrix}, $$ 
+and 
+$$W^L=
+\begin{pmatrix}
+I \\ S_x \\ 0 \\0
+\end{pmatrix}$$
+
+
+\subsubsection{Exponentialboys Model}
+Consider again a line of boys; however, this time the state of each boy is a result of interactions with every single other boy in line. Such a model can be represented with a  transition matrix as:
+\begin{displaymath}
+H = P (I + J \sum_{i=1}^{n-1} \sum_{j=i+1}^{n-1} K^{j-i}\sigma_i^x\otimes\sigma_j^x)
+\end{displaymath}
+Each site in this model is in turn influenced by an interaction with the remaining sites in the chain. A single site can change its state along with any other site, but this occurrence has a probability P which decays exponentially as the two sites increase in distance from one-another.
+
+The MPO of this model comprises of matrices:
+$$W^{i}=
+\begin{pmatrix}
+I & 0 & 0 \\
+S_x & K I & 0 \\
+0 & J K S_x & I
+\end{pmatrix},
+$$
+$$W^1=\begin{pmatrix}p_0 I & J K S_x & I\end{pmatrix}, $$ 
+and 
+$$W^L=
+\begin{pmatrix}
+I \\ S_x \\0
+\end{pmatrix}$$.
+
+
+\subsubsection{Projectionboys Model}
+Finally, consider again the first AngryBoys model, but subject to random events. These random events constitute an automatic transition of a sites state to either happy or angry, independent of its previous state. Modifying the original transition matrix, we create a new model described by:
+\begin{displaymath}
+H = p_0 I +  \sum_{i=1}^{n-1}(\frac{p_1}{n-1}\sigma_i^x\otimes\sigma_{i+1}^x + \frac{q_1}{n-1}\pi_i^+\otimes\pi_{i+1}^- + \frac{q_2}{n-1}\pi_i^+\otimes\pi_{i+1}^-)
+\end{displaymath}
+As before, a pair of sites in a chain of size N can change state with probability p. However, $\pi$ matrices given by:
+$$\pi^{+}=
+\begin{pmatrix}
+1 & 1 \\
+0 & 0
+\end{pmatrix}$$
+ 
+and:
+$$\pi^{-}=
+\begin{pmatrix}
+0 & 0 \\
+1 & 1
+\end{pmatrix}$$
+represent events occurring with probability $q_{1}$ and $q_{2}$ that the state of two partner sites will be flipped to either happy or angry respectively, regardless of any previous states.
+
+
+The components of the MPO are:
+$$W^{i}=
+\begin{pmatrix}
+I & 0 & 0 & 0 & 0 \\
+S_x & 0 & 0  & 0 & 0 \\
+\pi_i^+ & 0 & 0  & 0 & 0 \\
+\pi_i^- & 0 & 0  & 0 & 0 \\
+0 & p_1 S_x & q_1 \pi_i^+  & q_2 \pi_i^- & I
+\end{pmatrix},$$
+$$W^1=\begin{pmatrix}p_0 I & p_1 S_x & q_1 \pi_i^+ & q_2 \pi_i^- & I\end{pmatrix}$$ and
+$$W^L=
+\begin{pmatrix}
+I \\ S_x \\ \pi_i^+ \\ \pi_i^- \\ 0
+\end{pmatrix}$$.
+
+
+
+\begin{thebibliography}{99}
+\bibitem{white} S. R. White, {\it Physical Review Letters} {\bf 69}, 2863 (1992)
+\bibitem{schollwock} Ulrich Schollwoeck, {\it Annals of Physics} {\bf 326}, 96 (2011)
+\bibitem{cirac} Verstraete, F., and J. I. Cirac, (2004), arXiv:cond-mat/0407066v1
+\bibitem{vidal}G. Evenbly, G. Vidal, {\it J Stat Phys} (2011) {\bf 145:} 891-918
+\end{thebibliography}
+\end{document}
+

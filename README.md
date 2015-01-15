@@ -25,9 +25,13 @@ Here is a quick start guide.
     results: list of mps keeping the history
     t: current time
     epsil: error threshold for CompressionVariational.
+<<<<<<< HEAD
     cpr_err: error of the compression(L2 distance between compressed state and true state).
 The included functions are:
 CompressionSVDSweepToRight and CompressionSVDSweepToLeft are the two methods for SVD compression
+=======
+    cpr_err: error of the compression(L2 distance between compressed state and true state)
+>>>>>>> a8f74bccf2238781bc9e5294d8da637467c4a2b0
 
 * measurement.py defines the base measurement classe Measurement for all the measurement classes. It can compute the joint probability, correlation function, variance, and mean value at any time point. For the last two calculations, user can define specific values for being angry (up) or calm (down), and by default, they are 1 and -1 respectively. Both time and site number counts from 0, and a python-way of specifying the number from the end of list is also accepted. Each measurement task must be specified in a particular way, though measurement time can be omitted, in which case it is taken to be the most recent time computed. The class uses the solver to initialize, and the measure functions take the same input. They have different requested tasks and each measurement function should check the task properties. It will raise an exception if it does not fit. 
   For example, ("correlation", 1, [1, 2, 3, 4, 5]) measures <S1*S2*S3*S4*S5> at t = 1, task_type_string "Correlation", "Mean", "Variance", "Proba", more to be added some examples:("Correlation", 1, [1, 2, 3, 4, 5]) ("Mean", 1, [1]) ("Variance", 1, [1])("Proba", [(1, "up"), (3, "down")])It contains the following functions:

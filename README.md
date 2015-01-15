@@ -9,23 +9,23 @@ A detailed description of the problems, models and the algorithm is in the docum
 
 Structure:
 ---
-* proba.py is an example main caller and you can tune the parameters in the main function which runs both exact and mps models. It calculates the joint probability, the mean value and the variance in different models at any time points. And it can compare the to exact solution for short chains. Please be aware that the exact method can only calculate a short chain of a typical maximum size of 14, and the program raises an exception if the chain is too long to solve exactly.
-* proba_mps.py is an example that only uses the MPS method. Its function is similar to proba.py but do not perform an exact solution. You can feel free to try a system of size 200. It has four models and the user can choose which model to use. For example, angry_boys = AngryBoys(size = 200, remain_proba = 0.1, init_state = "all down") defines a chain using the Angryboys model with size 200.
-* model.py is the base model class for all the model classes. 
-* solver.py is the base solver class. 
-* exactsolver.py defines the exact traditional matrix method.
-* mpssolver.py defines the MPSsolver for the matrix product states method. It has the following variables that the user can tune according to his needs. 
-L: length of the chain. 
-bound_dimension: dimension of the auxilary space for the compressed MPS
-n: dimension of the physical space
-mps: current state expressed in mps. It is the mps obtained after apply the mpo
-mpsc: current compressed mps. It is obtained by calling compression algorithm
-mpo: operator. By convention we always apply mpo on mpsc
-partial_overlap_lr, partial_overlap_rl: the partial overlap between mps and mpsc. this is only useful in the algorithm of compression by variation
-results: list of mps keeping the history
-t: current time
-epsil: error threshold for CompressionVariational.
-cpr_err: error of the compression(L2 distance between compressed state and true state).
+* **proba.py** is an example main caller and you can tune the parameters in the main function which runs both exact and mps models. It calculates the joint probability, the mean value and the variance in different models at any time points. And it can compare the to exact solution for short chains. Please be aware that the exact method can only calculate a short chain of a typical maximum size of 14, and the program raises an exception if the chain is too long to solve exactly.
+* **proba_mps.py** is an example that only uses the MPS method. Its function is similar to proba.py but do not perform an exact solution. You can feel free to try a system of size 200. It has four models and the user can choose which model to use. For example, angry_boys = AngryBoys(size = 200, remain_proba = 0.1, init_state = "all down") defines a chain using the Angryboys model with size 200.
+* **model.py** is the base model class for all the model classes. 
+* **solver.py** is the base solver class. 
+* **exactsolver.py** defines the exact traditional matrix method.
+* **mpssolver.py** defines the MPSsolver for the matrix product states method. It has the following variables that the user can tune according to his needs. 
+*L*: length of the chain. 
+*bound_dimension*: dimension of the auxilary space for the compressed MPS
+*n*: dimension of the physical space
+*mps*: current state expressed in mps. It is the mps obtained after apply the mpo
+*mpsc*: current compressed mps. It is obtained by calling compression algorithm
+*mpo*: operator. By convention we always apply mpo on mpsc
+*partial_overlap_lr*, *partial_overlap_rl*: the partial overlap between mps and mpsc. this is only useful in the algorithm of compression by variation
+*results*: list of mps keeping the history
+*t*: current time
+*epsil*: error threshold for CompressionVariational.
+*cpr_err*: error of the compression(L2 distance between compressed state and true state).
 The included functions are:
 compressionVariational(self,direction=0,sweep_nbr=0,norm=0): compressesthe MPS stored in self.mps and writes the results in self.mpsc. The User can set the dimension of compressed MPS via the variable bound_dimension. The tolerance of convergence for sweeps can be accessed by self.epsil. Options available for self.compressionVariational include:
 A. direction: the direction of first sweep. 0 for left to right and 1 for right to left. The default is to sweep from left to right first.

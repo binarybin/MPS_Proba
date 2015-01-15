@@ -51,48 +51,6 @@ if __name__=="__main__":
 #    angry_boys = ExponentialBoys(size = 10, J = 0.5, K = 0.5, init_state = "all down")
 #    angry_boys = ProjectionBoys(size = 100, p0 = 1.0, p1 = 2.0, q1 = 2.0, q2 = 2.0, init_state = "all down")
 
-    """
-    mrs = []
-    evolve_time = []
-
-    import time
-    run_list = range(3,8)
-    for i in run_list:
-        start_time = time.time()
-        print "bound dimension: ", i
-        print "Solver Initialized"
-        mps_solver = MpsSolver(model = angry_boys, bound_dimension = i)
-        print "Evolve"
-        mps_solver.evolve(total_time)
-        print "Measure"
-        mps_measurement = MpsMeasurement(mps_solver)
-        mps_measurement.addMeasureTask(("Proba", [(5, "up"), (-1, "down")]))
-        mps_measurement.measure()
-        mrs.append(mps_measurement.measure_result_list[0])
-        evolve_time.append(time.time()-start_time)
-        print "Execution time: ", evolve_time[-1]
-
-    pylab.figure(1)
-    pylab.plot(run_list, mrs)
-
-    pylab.figure(2)
-    pylab.plot(run_list,evolve_time)
-    pylab.show()
-
-    """
-    """
-    for d in [12, 13, 14, 15, 16]:
-        mps_solver = MpsSolver(model = angry_boys, bound_dimension = d)
-        mps_solver.evolve(total_time)
-        mps_measurement   = MpsMeasurement(mps_solver)
-        for i in range(total_time):
-            mps_measurement.addMeasureTask(("Proba", i, [(5, "up"), (-1, "down")]))
-        mps_measurement.measure()
-        mrs = mps_measurement.measure_result_list
-        pylab.plot(range(len(mrs)), mrs, label = "mps d = "+str(d))
-    
-    
-    """
     exact_solver = ExactSolver(model = angry_boys)
     mps_solver = MpsSolver(model = angry_boys, bound_dimension = 10)
 

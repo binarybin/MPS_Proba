@@ -76,18 +76,18 @@ class MpsSolver(Solver):
     def evolve(self,nstep):
         for i in range(nstep):
             if (self.negative_norm_flag==0):
-		print "Step ", i
                 self.step()
             else:
                 break
 
     #Update the system state from t to t+1
     def step(self):
+        print "Step:", self.t
         self.t=self.t+1
         self.contraction()
 #        self.compressionSVDSweepToRightTest()
 #        self.compressionSVDSweepToLeftTest()
-        self.compressionVariational(1,0,0)
+        self.compressionVariational(0,1,0)
         self.results.append(self.mpsc)
 
     def compressionSVDSweepToRight(self):
@@ -227,7 +227,7 @@ class MpsSolver(Solver):
                 B=np.dot(np.diag(s),V)
                 self.mpsc[i+1]=np.tensordot(self.mpsc[i+1],B,axes=([1],[1]))
                 self.mpsc[i+1]=np.swapaxes(self.mpsc[i+1],1,2)
-            
+
 
     #Initialize the list of partial overlap, depending on the direction of first compression sweep.
     def initializePartialOvl(self,direction):
@@ -303,7 +303,7 @@ class MpsSolver(Solver):
                 print "Warning: Negative norm ("+str(self.l1_norm)+") obtained at t="+str(self.t+1)+", maybe stuck in a local minimum."
                 print "Try to increase epsilon or decrease the number of sweeps and call compressionVariational() again."
                 self.negative_norm_flag=1
-        
+
     #Perform a single sweep from right to left
     #Normalize the mpsc after each sweep if input norm=1
     def compressionSweepRightLeft(self,norm):
@@ -365,7 +365,7 @@ class MpsSolver(Solver):
     #main routine for compression by variation. Options:
     #direction: choose the direction for first sweep, 0 for left to right and 1 for right to left.
     #sweep_nbr: choose the number of sweeps. If sweep_nbr=0 then sweep until converge.
-    #norm: choose whether to normalize the states after each sweep. 
+    #norm: choose whether to normalize the states after each sweep.
     #If norm=0, then the normalization will take place after all sweeps
     #If norm=1, then the mpsc is normalized after each sweep.
     def compressionVariational(self,direction=0,sweep_nbr=0,norm=0):
@@ -403,7 +403,7 @@ class MpsSolver(Solver):
             # print(sweep)
             if (norm==0):
                 self.normalizeProba()
-                
+
         else:
             #sweep exactly as many as user requires
             for sweep in range(sweep_nbr):
@@ -418,7 +418,7 @@ class MpsSolver(Solver):
                     self.compressionSweepRightLeft(norm)
                     # print(self.l1_norm) # show the L1 norm of mpsc
                     error=abs(last_cpr_err-self.cpr_err)
-                    last_direction = 1                
+                    last_direction = 1
             if (norm==0):
                 self.normalizeProba()
 

@@ -1,4 +1,4 @@
-\documentclass[english, 12pt]{article}
+\documentclass[english]{article}
 \usepackage{graphicx}
 \usepackage[T1]{fontenc}
 \usepackage[latin9]{inputenc}
@@ -44,7 +44,7 @@ the density matrix renormalization group (DMRG), which proves to be an extremely
 
 This inter-departmental collaborative work applies this algorithm to other interesting problems. The algorithm's inherent probabilistic nature motivates its application to other difficult problems in probability theory and stochastic processes. An especially interesting example is the Markov process consisting of many degrees of freedom, which also forms an exponentially growing state space. 
 
-We have developed  a generic MPS solver and compare results from some simple applications with that of exact transition matrix solutions. We start with a simple model of the dynamics of human relations (``Angry Boys" model), and move on to included other more sophisticated models. Due to the time limitation, this project focuses on one dimensional models for which the algorithm is well-established in physics. Higher dimensionality or highly correlated relationships offering the most realistic relevance will be left to future work.
+We have developed  a generic MPS solver and compare results from some simple applications with that of exact transition matrix solutions. We start with a simple model of the dynamics of human relations (``Angry Boys" model), and move on to include other more sophisticated models. Due to the time limitation, this project focuses on one dimensional models for which the algorithm is well-established in physics. Higher dimensionality or highly correlated relationships offering the most realistic relevance will be left to future work.
 
 \section{Background}
 
@@ -85,14 +85,14 @@ The chain of $40$ sites is obviously intractable.
 
 \subsection{Matrix Product States (MPS)}
 
-The usual way to specify a general state vector is by enumerating its amplitudes for each individual product basis state vector, for example, representing $|\psi\rangle$ as the set $\{A_{\{\sigma_i\}}\}$ for all possible configurations of $\{\sigma_i\}$. Particularly, if each $\sigma_i$ takes values from the same set $\mathcal{S}$, which is usually the case considered, then we can think of each state vector as a function 
+The usual way to specify a general state vector is by enumerating its amplitudes for each individual product basis state vector; for example, representing $|\psi\rangle$ as the set $\{A_{\{\sigma_i\}}\}$ for all possible configurations of $\{\sigma_i\}$. Particularly, if each $\sigma_i$ takes values from the same set $\mathcal{S}$, which is usually the case considered, we can think of each state vector as a function 
 \begin{displaymath}
 |\psi\rangle: \mathcal{S}^{\otimes N} \rightarrow \mathbb{K}
 \end{displaymath}
-where $\mathbb{K}$ is the range of all amplitudes. In this situation, the function is represented as a table of values. On the other hand, we can also represent a function as an analytic expression like Taylor expansion or by some algebraic relations which is exactly what Matrix Product State exploits. In this case, as the name suggests, the function is represented by a product of matrices. Particularly, we have
+where $\mathbb{K}$ is the range of all amplitudes. In this situation, the function is represented as a table of values. On the other hand, we can also represent a function as an analytic expression like Taylor expansion or by some algebraic relations. Such a representation is exactly what Matrix Product State exploits. In this case, (as the name suggests) the function is represented by a product of matrices. Specifically, we have
 \begin{displaymath}
 \begin{split}
-|\psi\rangle: \mathcal{S}^{\otimes N} &\rightarrow \mathbb{K} \\
+|\psi\rangle: \mathcal{S}^{\otimes N} &\rightarrow \mathbb{K} \\s
 \sigma_1\sigma_2\cdots\sigma_N &\rightarrow M_1^{\sigma_1}M_2^{\sigma_2}\cdots M_N^{\sigma_N}
 \end{split}
 \end{displaymath}
@@ -100,20 +100,20 @@ where $M_i^{\sigma_i}$ is the matrix at site $i$ with state indexed by $\sigma_i
 \begin{displaymath}
 A_{\{\sigma_i\}} = M_1^{\sigma_1}M_2^{\sigma_2}\cdots M_N^{\sigma_N}
 \end{displaymath}
-This way, instead of specifying $|\mathcal{S}|^N$ values $\{A_{\{\sigma_i\}}\}$ for a state vector, $N$ matrices are used, which may be of different ranks at different sites.
+Thus, $N$  matrices are used instead of specifying $|\mathcal{S}|^N$ values $\{A_{\{\sigma_i\}}\}$ for a state vector that may be of different ranks at different sites.
 
 To go from the tabular specification of a state vector to its matrix product state representation, the technique of Singular Value Decomposition (SVD) can be exploited. Let's focus on the coefficient $A_{\{\sigma_{i}\}}=A_{\sigma_{1}\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N}}$.
-From a direct point of view, it is a rank-N tensor which has N indices,
-but we can group some indices so that it becomes $A_{\sigma_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
-with only $2$ indices where the first has $m(=|\mathcal{S}|)$ possible values and
+From a direct point of view, it is a rank-N tensor which has N indices.
+We can group some indices so that it becomes $A_{\sigma_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
+with only $2$ indices, where the first has $m(=|\mathcal{S}|)$ possible values and
 the second has $m^{N-1}$. Grouping $N-1$ indices means making a
-bijection map from $N-1$ numbers each varying between $1$ and $m$ to
+bijection map from $N-1$ numbers, each varying between $1$ and $m$ to
 a single integer varying from $1$ to $m^{N-1}$. This re-indicing
-trick is crucial in MPS algorithms.
+trick is crucial to MPS algorithms.
 
 We then treat this bi-index object $A_{\sigma_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
-as a matrix with $\sigma_{1}$ the row index and $(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})$
-the column index, thus forming a $m\times m^{N-1}$ matrix. Applying
+as a matrix with $\sigma_{1}$  (row index) and $(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})$
+ (column index), thus forming a $m\times m^{N-1}$ matrix. Applying
 SVD on this matrix gives 
 \[
 A_{\sigma_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=U_{m_{1}}^{\sigma_{1}}S_{m_{1}m_{2}}V_{m_{2}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=U_{m_{1}}^{\sigma_{1}}\tilde{V}_{m_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}
@@ -127,29 +127,29 @@ and applying a similar SVD:
 \[
 \tilde{V}_{(m_{1}\sigma_{2})(\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=U_{(m_{1}\sigma_{2})m_{2}}S_{m_{2}m_{2}'}V_{m_{2}'(\sigma_{3}\cdot\cdot\cdot\sigma_{N})}=U_{m_{1}m_{2}}^{\sigma_{2}}\tilde{V}_{m_{2}(\sigma_{3}\cdot\cdot\cdot\sigma_{N})}
 \]
-where the second ``$=$'' reshapes the $U$ matrix and multiplied
+where the second ``$=$'' reshapes the $U$ matrix and multiplies
 the $S$ and $V$ matrices. 
 
 Noticing that $\tilde{V}_{m_{2}(\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
-is almost the same as $\tilde{V}_{m_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$
-except for having one fewer $\sigma_{i}$, we apply this procedure
-inductively and write the original coefficient tensor as
+is almost the same as $\tilde{V}_{m_{1}(\sigma_{2}\sigma_{3}\cdot\cdot\cdot\sigma_{N})}$,
+with the exception of having one fewer $\sigma_{i}$, we apply this procedure
+inductively to write the original coefficient tensor as
 
 \[
 A_{\{\sigma_{i}\}}=U_{m_{1}}^{\sigma_{1}}U_{m_{1}m_{2}}^{\sigma_{2}}U_{m_{2}m_{3}}^{\sigma_{3}}\cdot\cdot\cdot U_{m_{N-1}m_{N}}^{\sigma_{N}}
 \]
-This resulting form then gives matrix product state. $\sigma_{i}$'s
+This resulting form  provides the matrix product state. The $\sigma_{i}$'s
 are called ``physical indices', and $m_{i}$'s are called ``auxiliary
-indices''. It is worth noting that, in general, operators can also
-be decomposed in this way, although it is usually more convenient
-to directly construct operators in the so-called matrix product form which can directly acts on matrix product states. This representation
-is extremely convenient since each matrix $U$ contains only one physical
-index, and the application of a matrix product linear operator
+indices''. It is worth noting that in general, operators can also
+be decomposed in this way - although it is usually more convenient
+to directly construct operators in the so-called matrix product form which can then directly act on matrix product states. This representation
+is extremely convenient because each matrix $U$ contains only one physical
+index, while the application of a matrix product linear operator
 on a matrix product state only involves the contraction of a few indices.
 
 To illustrate, if we have a linear operator $O_{\{\sigma'\}\{\sigma\}}=O_{n_{1}}^{\sigma'_{1}\sigma_{1}}O_{n_{1}n_{2}}^{\sigma'_{2}\sigma_{2}}O_{n_{2}n_{3}}^{\sigma'_{3}\sigma_{3}}\cdot\cdot\cdot O_{n_{N-1}n_{N}}^{\sigma'_{N}\sigma_{N}}$
 then applying this operator on the MPS is actually the contraction
-on $m$, $n$ and $\sigma_{i}$ space. The traditional way corresponds
+on $m$, $n$, and $\sigma_{i}$ space. The traditional methodology corresponds
 to first contracting $m$ and $n$ spaces, and then $\sigma$. However, this
 novel method contracts the $\sigma$ space first and then $m$ and
 $n$. The specific order of contraction is:
@@ -158,12 +158,23 @@ $n$. The specific order of contraction is:
 for all $i$'s
 \item $\sum_{n_{1}m_{1}}M_{n_{1}m_{1}}^{\sigma'_{1}}M_{n_{1}n_{2}m_{1}m_{2}}^{\sigma'_{2}}=\tilde{M}_{n_{2}m_{2}}^{\sigma'_{1}\sigma'_{2}}$
 \item $\sum_{n_{2}m_{2}}\tilde{M}{}_{n_{2}m_{2}}^{\sigma'_{1}\sigma'_{2}}M_{n_{2}n_{3}m_{2}m_{3}}^{\sigma'_{3}}=\tilde{M}_{n_{3}m_{3}}^{\sigma'_{1}\sigma'_{2}\sigma'_{3}}$
-\item keep doing this, until we finish the multiplication of all these objects
+\item we keep doing this, until we finish the multiplication of all these objects
 and get $\tilde{M}^{\sigma'_{1}\sigma'_{2}\cdot\cdot\cdot\sigma'_{N}}=A_{\sigma'_{1}\sigma'_{2}\cdot\cdot\cdot\sigma'_{N}}$
-which is the final result, coefficients of the new state $|\psi'\rangle=\sum_{\{\sigma'_{i}\}}A_{\sigma'_{1}\sigma'_{2}\cdot\cdot\cdot\sigma'_{N}}|\sigma_{1}\sigma_{2}\text{\ensuremath{\cdot}}\text{\ensuremath{\cdot}}\text{\ensuremath{\cdot}}\sigma_{N}\rangle$.
+This is the final result - coefficients of the new state $|\psi'\rangle=\sum_{\{\sigma'_{i}\}}A_{\sigma'_{1}\sigma'_{2}\cdot\cdot\cdot\sigma'_{N}}|\sigma_{1}\sigma_{2}\text{\ensuremath{\cdot}}\text{\ensuremath{\cdot}}\text{\ensuremath{\cdot}}\sigma_{N}\rangle$.
 \end{itemize}
 
 
+\subsection{Canonization}
+Canonization is an important operation on the matrix product state. As we shall see in the following, the operations of compression heavily relies on the canonical representation of a MPS. Consider a MPS in the following form
+\[
+|\psi \rangle =\sum_{\sigma}A^{\sigma_1}A^{\sigma_2}\dots A^{\sigma_{i-1}}\Psi B^{\sigma_{i+1}}\dots B^{\sigma_{L-1}} B^{\sigma_L} |\sigma\rangle
+\]
+We call that $\psi$ a mixed-canonized MPS if the matices $A^{\sigma_i}$ are left-normalized and the matices $B^{\sigma_i}$ are right-normalized, i.e.
+\[
+\sum_{\sigma_i} A^{\sigma_i,*}A^{\sigma_i} = I,\;\;\;\sum_{\sigma_i} B^{\sigma_i}B^{\sigma_i,*}=I
+\]
+where $M^*$ denotes the conjugate transpose of matrix $M$. Given any MPS $|\psi\rangle$ with matrices $M^{\sigma_i}$, the canonization of $|\psi\rangle$ can be done iteratively. The key tool of this process relies on the singular value decomposition. Starting from the first the first physical site $\sigma_1$, we can reshape the matrices $M_{a_0,a_1}^{\sigma_1}$ into one matrix $M_{(\sigma_1,a_0),a_1}$. Apply singular value decomposition on this reshaped matrix $M_{(\sigma_1,a_0),a_1}=\sigma_{s_1} U_{(\sigma_1,a_0),s_1} S_{s_1,s_1} V^{*}_{s_1,a_1}$. where $U$ is a matrix composed of orthogonal column vectors. Now if we reshape $U_{(\sigma_1,a_0),s_1}$ back into a set of matrices $A_{a_0,s_1}^{\sigma_1}$. Then $A^{\sigma_1}$ will be left-normalized. We then multiply $SV$ to the matrix representing the next physical state $M^{\sigma_2}$ and repeat the same procedure as before. Obviously, this procedure can be carried out from right to left and that will give the right-normalized matrices.
+Carrying out the procedure from to directions in the same time will provide us a mix-canonical representation of the MPS. Notice here that the operations mentioned here will not modify the state. It only provides a convenient representation of the state.
 
 \subsection{Approximation}
 
@@ -184,6 +195,7 @@ points, $\chi$ does not grow with system size (the length); in critical
 in 2D, $\chi\propto\exp W$ which is the exponential of short dimension.
 
 \subsubsection{Compression by SVD}
+The idea of compression by SVD comes from the procedure of the canonization. When performing the left-canonization on the matrix of a certain physical site, upon obtaining the singular value decomposition, we may simply truncate the diagonal matrix $S$ by throwing away the small eigen values. By truncating the diagonal matrix $S$, we also truncate accordingly $U$ and $V$, therefore we can reduce the size of the MPS. Note that this procedure can be carried out from two different directions and yields different compression results. In addition, the error of compression will accumulate as we go on with the iterations. Because of this, the results might be far from optimal.
 \subsubsection{Compression by variation}
 Denote $|\psi\rangle=\sum_{\sigma}M^{\sigma_1}\dots M^{\sigma_L}$ the MPS to be compressed. The method of compression by variation consists of finding a new MPS $|\bar\psi\rangle=\sum_{\sigma}\bar M^{\sigma_1}\dots 
  \bar M^{\sigma_L}$ where each $\bar M^{\sigma_i}$ of desired size, such that the $L^2-$ distance between $|\bar\psi\rangle$ and $|\psi\rangle$ is minimized. Formally:
@@ -211,13 +223,14 @@ Here $\sigma\setminus\sigma_i$ means the sum takes over all the physical sites e
 \]
 where $L$ is the overlap of $M$ and $\bar M$ from left to the $(i-1)$th state, and $R$ is the overlap of $M$ and $\bar M$ from right to the $(i+1)$th state. We call objects like $L$ and $R$ respectively the left partial overlap and the right partial overlap. Obviously from what has been described about the algorithm, the partial overlaps need to be used and updated during the sweeps. When implementing the algorithm, we store them in the lists \texttt{self.partial\textunderscore overlap\textunderscore lr} and \texttt{self.partial\textunderscore overlap\textunderscore rl}. Note that the last element of \texttt{self.partial\textunderscore overlap\textunderscore lr} and the first element of \texttt{self.partial\textunderscore overlap\textunderscore lr} are actually the full overlap of the compressed state and the original state. This is useful in computing the $L^2-$distance and in deciding when to stop the sweep.
 
-Attention must also be paid to the normalization. Indeed, all the MPS studied here represent a probability distribution. Thus, summing over all the physical states must yield unity. However, this can no longer be guaranteed after the procedure of compression . Therefore, the result of compression must be normalized by its $L^1-$norm.
+Attention must also be paid to the normalization. Indeed, all MPS studied here represent a probability distribution. Thus, summing over all the physical states must yield unity. However, this can no longer be guaranteed after the procedure of compression . Therefore, the result of compression must be normalized by its $L^1-$norm.
 
 
 \subsection{Matrix Product Operators (MPO)}
 The Hamiltonian in quantum mechanics, or equivalently the transitional matrix in stochastic processes, can be written as a series of matrix product operators where each matrix only applies on one site.
 We considered four different models to implement our MPS algorithm.
 \subsubsection{AngryBoys Model}
+Consider boys waiting in a line. Each boy's state can be defined as either an angry one, or a happy one. If we desire to model the individual states of the entire line of boys over time, we can implement a model dependent upon a transitional matrix method given by:
 \begin{displaymath}
 H = pI + (1-p)\sum_{i=1}^{n-1}\frac{1}{n-1}\sigma_i^x\otimes\sigma_{i+1}^x,
 \end{displaymath}
@@ -229,12 +242,14 @@ where $I$ is a $2^n\times2^n$ identity matrix and
 1 & 0
 \end{pmatrix}
 \end{displaymath}
-As described in 3.1 Model.
+as described in Model. If he is angry, he has a probability p of remaining angry, but also a probaility p of becoming happy. This model also intends a boy to be influenced with equal probability by its left and right neighbors in larger chains. Two emotional boys have probability p that they will change their state together - otherwise, they remain in their respective states. In the case of N emotional boys, a pair of nearest neighbors will change states together with probability p, and otherwise remain in their respective states.
+
+
 The MPO of this model is 
 $$
 O=W^{[1]}W^{[2]} ... W^{[L]}
 $$
-And it can be encoded by the operator valued matrices below:
+And can be encoded by the operator valued matrices below:
 $$
 W^{i}=
 \begin{pmatrix}
@@ -243,17 +258,21 @@ S_x & 0 & 0 \\
 0 & qS_x & I
 \end{pmatrix}
 $$
-And  we have $W^1=\begin{pmatrix}p I & q S_x & I\end{pmatrix}$ on the first site of the chain, 
+where $W^1=\begin{pmatrix}p I & q S_x & I\end{pmatrix}$ on the first site of the chain, and
 $$W^L=\begin{pmatrix}
 I \\ S_x \\ 0
 \end{pmatrix}$$
 on the last site.
 
 \subsubsection{RadiatingBoys Model}
+Consider now a situation where the boys are impacted by more than just their nearest neighbor. Again returning to a transitional matrix method, we can implement another model given by:
 \begin{displaymath}
 H=p_0 I + p_1 \sum_{i=1}^{n-1}\frac{1}{n-1}\sigma_i^x\otimes\sigma_{i+1}^x + p_2 \sum_{i=1}^{n-2}\frac{1}{n-2}\sigma_i^x\otimes\sigma_{i+2}^x
 \end{displaymath}
-In this model, the state of a boy could be affected by both its nearest neighbor and its second nearest neighbor. And the MPO can be decomposed into the following matrices:
+This model is similar to the Angry Boys model, but now depends additionally on a second-nearest neighbor interaction. In the case of N emotional boys, a pair of nearest neighbors and a pair of second-nearest neighbors influence eachother, but at different rates. Sites adjacent to each other will change together with probability $p_{1}$, and otherwise remain in their respective states. Sites separated by a single site can also now change together with  probability $p_{2}$, and otherwise remain in their respective states.
+
+
+The MPO can be decomposed into the following matrices:
 $$
 W^{i}=
 \begin{pmatrix}
@@ -263,7 +282,8 @@ S_x & 0 & 0 & 0 \\
 0 & p_1 S_x & p_2 S_x & I
 \end{pmatrix}
 $$
-and $W^1=\begin{pmatrix}p_0 I & p_1 S_x & p_2 S_x & I\end{pmatrix}$ and 
+ $$W^1=\begin{pmatrix}p_0 I & p_1 S_x & p_2 S_x & I\end{pmatrix}, $$ 
+and 
 $$W^L=
 \begin{pmatrix}
 I \\ S_x \\ 0 \\0
@@ -271,18 +291,22 @@ I \\ S_x \\ 0 \\0
 
 
 \subsubsection{Exponentialboys Model}
+Consider again a line of boys; however, this time the state of each boy is a result of interactions with every single other boy in line. Such a model can be represented with a  transition matrix as:
 \begin{displaymath}
 H = P (I + J \sum_{i=1}^{n-1} \sum_{j=i+1}^{n-1} K^{j-i}\sigma_i^x\otimes\sigma_j^x)
 \end{displaymath}
+Each site in this model is in turn influenced by an interaction with the remaining sites in the chain. A single site can change its state along with any other site, but this occurrence has a probability P which decays exponentially as the two sites increase in distance from one-another.
+
 The MPO of this model comprises of matrices:
 $$W^{i}=
 \begin{pmatrix}
 I & 0 & 0 \\
 S_x & K I & 0 \\
 0 & J K S_x & I
-\end{pmatrix}
-$$,
-$W^1=\begin{pmatrix}p_0 I & J K S_x & I\end{pmatrix}$ and 
+\end{pmatrix},
+$$
+$$W^1=\begin{pmatrix}p_0 I & J K S_x & I\end{pmatrix}, $$ 
+and 
 $$W^L=
 \begin{pmatrix}
 I \\ S_x \\0
@@ -290,9 +314,26 @@ I \\ S_x \\0
 
 
 \subsubsection{Projectionboys Model}
+Finally, consider again the first AngryBoys model, but subject to random events. These random events constitute an automatic transition of a sites state to either happy or angry, independent of its previous state. Modifying the original transition matrix, we create a new model described by:
 \begin{displaymath}
 H = p_0 I +  \sum_{i=1}^{n-1}(\frac{p_1}{n-1}\sigma_i^x\otimes\sigma_{i+1}^x + \frac{q_1}{n-1}\pi_i^+\otimes\pi_{i+1}^- + \frac{q_2}{n-1}\pi_i^+\otimes\pi_{i+1}^-)
 \end{displaymath}
+As before, a pair of sites in a chain of size N can change state with probability p. However, $\pi$ matrices given by:
+$$\pi^{+}=
+\begin{pmatrix}
+1 & 1 \\
+0 & 0
+\end{pmatrix}$$
+ 
+and:
+$$\pi^{-}=
+\begin{pmatrix}
+0 & 0 \\
+1 & 1
+\end{pmatrix}$$
+represent events occurring with probability $q_{1}$ and $q_{2}$ that the state of two partner sites will be flipped to either happy or angry respectively, regardless of any previous states.
+
+
 The components of the MPO are:
 $$W^{i}=
 \begin{pmatrix}
@@ -301,8 +342,8 @@ S_x & 0 & 0  & 0 & 0 \\
 \pi_i^+ & 0 & 0  & 0 & 0 \\
 \pi_i^- & 0 & 0  & 0 & 0 \\
 0 & p_1 S_x & q_1 \pi_i^+  & q_2 \pi_i^- & I
-\end{pmatrix}$$,
-$W^1=\begin{pmatrix}p_0 I & p_1 S_x & q_1 \pi_i^+ & q_2 \pi_i^- & I\end{pmatrix}$ and
+\end{pmatrix},$$
+$$W^1=\begin{pmatrix}p_0 I & p_1 S_x & q_1 \pi_i^+ & q_2 \pi_i^- & I\end{pmatrix}$$ and
 $$W^L=
 \begin{pmatrix}
 I \\ S_x \\ \pi_i^+ \\ \pi_i^- \\ 0
@@ -350,15 +391,15 @@ operates on the state space of position $i$.  Qualitatively, the transition matr
 
 \subsubsection{Solving the Problem Computationally}
 	Simulating a solution to the many body problem is computationally intense. Construction of the transition matrix at each time step requires a summation over $N$ indices of $\sigma_{i}$
-simultaneously, meaning $m^{N}$ terms are examined. For a simply model where a body occupies one of two elemetary states, $m^{N}\approx10^{9}$ for $N=30$. A simulation of $40$ sites is impossible.  Nonetheless, an exact solution class $ExactSolver$ bounded by reasonably-sized state spaces has been constructed as a corroboration of results obtained through the MPS algorithm.
+simultaneously, meaning $m^{N}$ terms are examined. For a simply model where a body occupies one of two elemetary states, $m^{N}\approx10^{9}$ for $N=30$. A simulation of $40$ sites is impossible.  Nonetheless, an exact solution class \texttt{ExactSolver} bounded by reasonably-sized state spaces has been constructed as a corroboration of results obtained through the MPS algorithm.
 
-The $ExactSolver$ class takes the $Solver$ class as its parent. Its dependencies include the $numpy$ library, the deepcopy function of the $copy$ library, and a $Boys$ model from its respective parent class. Three functions defined in the class - $interpreter$, $step$, and $evolve$ - conduct simulation. Data from the simulation is collected in the form of lists. One list saves the state of the model at each time step, and one list saves the sum of probabilities at each step to ensure proper normalization of the model (probability cannot exceed 1).
+The \texttt{ExactSolver} class takes the \texttt{Solver} class as its parent. Its dependencies include the \texttt{numpy} library, the deepcopy function of the \texttt{copy} library, and a \texttt{Boys} model from its respective parent class. Three functions defined in the class - \texttt{interpreter}, \texttt{step}, and \texttt{evolve} - conduct simulation. Data from the simulation is collected in the form of lists. One list saves the state of the model at each time step, and one list saves the sum of probabilities at each step to ensure proper normalization of the model (probability cannot exceed 1).
 
-The $interpreter$ function accepts the imported model, reads its information, and initiates the simulation. The model's information consists of the beginning transition matrix and the initial state. Once the transition matrix is set, and the initial state is set and saved, simulation can commence. This represents a change from the alpha version; orginally, $interpreter$ itself was used to initiate the transition matrix and initial state. The beta version now offers functions to do this so that models with more diverse properties can interact with the solver. For instance, models reflecting influence from only a left or right neighbor can direct their unique transition matrix to $ExactSolver$. Additional control over initial state conditions is also given.
+The \texttt{interpreter} function accepts the imported model, reads its information, and initiates the simulation. The model's information consists of the beginning transition matrix and the initial state. Once the transition matrix is set, and the initial state is set and saved, simulation can commence. This represents a change from the alpha version; orginally, \texttt{interpreter} itself was used to initiate the transition matrix and initial state. The beta version now offers functions to do this so that models with more diverse properties can interact with the solver. For instance, models reflecting influence from only a left or right neighbor can direct their unique transition matrix to \texttt{ExactSolver}. Additional control over initial state conditions is also given.
 
-The $step$ function is very simple. It first increments simulation time, and then produces a new state by calculating the tensor dot product of the transition matrix and previous state.
+The \texttt{step} function is very simple. It first increments simulation time, and then produces a new state by calculating the tensor dot product of the transition matrix and previous state.
 
-The $evolve$ function controls the flow of the simulation by taking as its argument the total number of time steps desired for the simulation. $evolve$ calls $step$ to produce a new state, and then appends this state and its norm to its respective data list. This process is done iteratively for the number of time steps, producing a time evolution of the model. 
+The \texttt{evolve} function controls the flow of the simulation by taking as its argument the total number of time steps desired for the simulation. \texttt{evolve} calls \texttt{step} to produce a new state, and then appends this state and its norm to its respective data list. This process is done iteratively for the number of time steps, producing a time evolution of the model. 
 
 
 \subsection{\texttt{MpsSolver} Class}
@@ -366,7 +407,7 @@ Parallel to the class \texttt{ExactSolver}, we construct a class named \texttt{M
 \subsubsection{Member variables}
 We have the current state saved under a variable named \texttt{mps}, which is a 3-d array storing $M^{\sigma_i}_{a_{i-1},a_i}$. The operator $O^{\sigma_i, \sigma'_i}_{n_{i-1}, n_i}$ is stored in a variable named \texttt{mpo}, which is a 4-d array. After applying the MPO on the MPS, we do the compression and the result is stored in \texttt{mpsc}. In addition, we store the time of the system in the variable \texttt{t}. These are variables defining the current state of the system. In addition, \texttt{MpsSolver} also hosts parameters and auxiliary variables used by overlap, compression and other routines in the class. For example, \texttt{bound\_dimension} defines the dimension of the compressed MPS.
 \subsubsection{Methods}
-The key method in the \texttt{MpsSolver} class is \texttt{step()} which updates the system from $t$ to $t+1$. The updating involves three steps: (i) applying MPO on MPS (ii) compressing MPS to the desired size. (iii) normalizing the compressed state. We implement \texttt{contraction} to realize step 1, which just involves some basic operations of multiplication of arrays and summing over a certain number of indices. For the compression step, we implement two methods \texttt{compressionSVD} and \texttt{compressionVariational} from which user can choose which to use. \texttt{normalizeProba} is implemented for normalize the compressed MPS so that it becomes a probability distribution. Finally, we also implement \texttt{evolve()} that allows user to update the system for a certain number of times.
+The key method in the \texttt{MpsSolver} class is \texttt{step()} which updates the system from $t$ to $t+1$. The updating process involves three steps: (i) applying MPO on MPS (ii) compressing MPS to the desired size. (iii) normalizing the compressed state. We implement \texttt{contraction} to realize step 1, which simply involves some basic operations of multiplication of arrays and summing over a certain number of indices. For the compression step, we implement two methods: \texttt{compressionSVD}, and \texttt{compressionVariational} from which the user can choose which to use. \texttt{normalizeProba} is implemented to normalize the compressed MPS so that it becomes a probability distribution. Finally, we also implement \texttt{evolve()} to allow the user to update the system a certain number of times.
 \subsubsection{Compression by variation}
 The main routine for compression by variation is \texttt{compressionVariational}. It does the following operations:
 \begin{itemize}
@@ -479,17 +520,17 @@ Fig.\ref{fig:Projection_result} is the result of the Projection Boys Model.
   \label{fig:Projection_result}
 \end{figure}
 \section{Conclusion}
-Physics research has stimulated many ideas in mathematics for centuries, from Newton's famous invention of calculus to differential equations in the 19th century, up till fiber bundles in modern geometry and tensor category in modern algebra, inspired by particle physics. We believe that, as physics uses more computer technology in the past several decades, it should also inspire some ideas in computer science. This project is an attempt for this goal.
+From Newton's famous invention of calculus, to differential equations in the 19th century, fiber bundles in modern geometry, and tensor category in modern algebra inspired by particle physics; there can be no doubt physics research has stimulated many ideas in mathematics for centuries. We believe that, as physics has adopted computer technology over the past several decades, it should also inspire more ideas in computer science. This project is an attempt at attaining this goal.
 
-The structures in quantum many body physics resembles much the classical probability theory, with the exception of interpreting the 2-norm rather than 1-norm as probability. Physicists developed many methods to compute the time evolution of states (or "wave functions") in the context of quantum mechanics, and we naturally extend this MPS approach to classical probability theory.
+The structures in quantum many body physicsgeatly  resembles classical probability theory, with the exception of interpreting the 2-norm rather than 1-norm as probability. Physicists developed many methods to compute the time evolution of states (or "wave functions") in the context of quantum mechanics, and we naturally extend this MPS approach to classical probability theory.
 
-It is proved in the physics context that the bound dimension of the MPS does not grow with the chain length for a 1-D problem, which is called the area law. An intuitive way to understand is that, if only the states in a finite range connect to each other, a cut in the chain will break some "information sharing", but the amount of the broken information does not grow with the chain length. While it is unclear whether we have a similar "area law" in this probability context, it worths to give it a try.
+It is proved in the physics context that the bound dimension of the MPS does not grow with the chain length for a 1-D problem, which is called the area law. An intuitive way to understand is that, if the states in a finite range connect only to each other, a cut in the chain will break some "information sharing". Nonetheless, the amount of the broken information does not grow with the chain length. While it is unclear whether we have a similar "area law" in this probability context, it was well worth it to give it a try.
 
-As our results have shown, the algorithm works very well for short and intermediate length chains and we need a larger bound dimension to get a good result for the joint probability. It is still an open question what the proper bound dimension is, but in most of the cases, a chain of length 200 can be solved with a bound dimension of 20.
+As our results have shown, the algorithm works very well for short and intermediate length chains, while we need a larger bound dimension to get a good result for the joint probability. The proper bound dimension is still an open question, but in most cases, a chain of length 200 can be solved with a bound dimension of 20.
 
-\noindent \textbf{What do we learn?}
+\noindent \textbf{What did we learn?}
 
-Developing code in a group collaboration is not an easy process, and we managed it quite well. We held several design meetings in the beginning and discussed the algorithm quite thoroughly. The task assignment is very clear and everyone worked on different files to resolve the collisions easily. The process that we could improve next time is that, when writing the report, we did not split the sections in different files, which caused many collision problems.
+Developing code using group collaboration is not an easy process, but we managed it quite well. We held several design meetings in the beginning and discussed the algorithm quite thoroughly. The task assignment was very clear and everyone worked on different files to resolve any ensuing collisions easily. The process we could improve in the future is managin writing of the final report. We did not split sections in different files wisely, which caused many collision problems.
 \begin{thebibliography}{99}
 \bibitem{white} S. R. White, {\it Physical Review Letters} {\bf 69}, 2863 (1992)
 \bibitem{schollwock} Ulrich Schollwoeck, {\it Annals of Physics} {\bf 326}, 96 (2011)

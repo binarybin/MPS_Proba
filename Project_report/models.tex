@@ -1,0 +1,91 @@
+We considered four different models to implement our MPS algorithm.
+\subsubsection{AngryBoys Model}
+\begin{displaymath}
+H = pI + (1-p)\sum_{i=1}^{n-1}\frac{1}{n-1}\sigma_i^x\otimes\sigma_{i+1}^x,
+\end{displaymath}
+where $I$ is a $2^n\times2^n$ identity matrix and 
+\begin{displaymath}
+\sigma_i^x = 
+\begin{pmatrix}
+0 & 1 \\
+1 & 0
+\end{pmatrix}
+\end{displaymath}
+As described in 3.1 Model.
+The MPO of this model is 
+$$
+O=W^{[1]}W^{[2]} ... W^{[L]}
+$$
+And it can be encoded by the operator valued matrices below:
+$$
+W^{i}=
+\begin{pmatrix}
+I & 0 & 0 \\
+S_x & 0 & 0 \\
+0 & qS_x & I
+\end{pmatrix}
+$$
+And  we have $W^1=\begin{pmatrix}p I & q S_x & I\end{pmatrix}$ on the first site of the chain, 
+$$W^L=\begin{pmatrix}
+I \\ S_x \\ 0
+\end{pmatrix}$$
+on the last site.
+
+\subsubsection{RadiatingBoys Model}
+\begin{displaymath}
+H=p_0 I + p_1 \sum_{i=1}^{n-1}\frac{1}{n-1}\sigma_i^x\otimes\sigma_{i+1}^x + p_2 \sum_{i=1}^{n-2}\frac{1}{n-2}\sigma_i^x\otimes\sigma_{i+2}^x
+\end{displaymath}
+In this model, the state of a boy could be affected by both its nearest neighbor and its second nearest neighbor. And the MPO can be decomposed into the following matrices:
+$$
+W^{i}=
+\begin{pmatrix}
+I & 0 & 0 & 0 \\
+S_x & 0 & 0 & 0 \\
+0 & I & 0 & 0 \\
+0 & p_1 S_x & p_2 S_x & I
+\end{pmatrix}
+$$
+and $W^1=\begin{pmatrix}p_0 I & p_1 S_x & p_2 S_x & I\end{pmatrix}$ and 
+$$W^L=
+\begin{pmatrix}
+I \\ S_x \\ 0 \\0
+\end{pmatrix}$$
+
+
+\subsubsection{Exponentialboys Model}
+\begin{displaymath}
+H = P (I + J \sum_{i=1}^{n-1} \sum_{j=i+1}^{n-1} K^{j-i}\sigma_i^x\otimes\sigma_j^x)
+\end{displaymath}
+The MPO of this model comprises of matrices:
+$$W^{i}=
+\begin{pmatrix}
+I & 0 & 0 \\
+S_x & K I & 0 \\
+0 & J K S_x & I
+\end{pmatrix}
+$$,
+$W^1=\begin{pmatrix}p_0 I & J K S_x & I\end{pmatrix}$ and 
+$$W^L=
+\begin{pmatrix}
+I \\ S_x \\0
+\end{pmatrix}$$.
+
+
+\subsubsection{Projectionboys Model}
+\begin{displaymath}
+H = p_0 I +  \sum_{i=1}^{n-1}(\frac{p_1}{n-1}\sigma_i^x\otimes\sigma_{i+1}^x + \frac{q_1}{n-1}\pi_i^+\otimes\pi_{i+1}^- + \frac{q_2}{n-1}\pi_i^+\otimes\pi_{i+1}^-)
+\end{displaymath}
+The components of the MPO are:
+$$W^{i}=
+\begin{pmatrix}
+I & 0 & 0 & 0 & 0 \\
+S_x & 0 & 0  & 0 & 0 \\
+\pi_i^+ & 0 & 0  & 0 & 0 \\
+\pi_i^- & 0 & 0  & 0 & 0 \\
+0 & p_1 S_x & q_1 \pi_i^+  & q_2 \pi_i^- & I
+\end{pmatrix}$$,
+$W^1=\begin{pmatrix}p_0 I & p_1 S_x & q_1 \pi_i^+ & q_2 \pi_i^- & I\end{pmatrix}$ and
+$$W^L=
+\begin{pmatrix}
+I \\ S_x \\ \pi_i^+ \\ \pi_i^- \\ 0
+\end{pmatrix}$$.

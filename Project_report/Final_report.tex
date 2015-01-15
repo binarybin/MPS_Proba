@@ -168,6 +168,7 @@ in 2D, $\chi\propto\exp W$ which is the exponential of short dimension.
 
 \subsection{Matrix Product Operators (MPO)}
 The Hamiltonian in quantum mechanics, or equivalently the transitional matrix in stochastic processes, can be written as a series of matrix product operators where each matrix only applies on one site.
+\input{models.tex}
 
 \section{Program Overview}
 In this project, we extend the usage of MPS and MPO to problems concerning stochastic processes. Particularly, we  consider the time evolution of a probability distribution expressed in a vector form, where the dynamics are specified by a probability transition matrix.
@@ -265,7 +266,7 @@ Throughout the sweeps, we also keep track of the $L^1-$norm of the MPS. The User
 \end{itemize}
 Example: \texttt{self.compressionVariational(, 4, 1)} will perform 4 compression sweeps, with the first one starting from right to left. The compressed MPS will be normalized after each sweep.
 
-\input{models_results.tex}
+\input{results.tex}
 
 
 \begin{thebibliography}{99}
